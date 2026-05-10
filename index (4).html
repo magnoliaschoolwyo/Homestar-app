@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#ff6b9d">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-512.png">
+<meta name="apple-mobile-web-app-title" content="HomeStar">
+<title>HomeStar ⭐</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --purple: #a855f7;
+  --pink: #ec4899;
+  --glass: rgba(255,255,255,0.22);
+  --glass-border: rgba(255,255,255,0.38);
+  --radius: 20px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a0533; overflow: hidden; }
+
+/* BACKGROUND */
+#bg {
+  position: fixed; inset: 0; z-index: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  transition: background-image 0.8s ease;
+}
+#bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(10,0,40,0.52) 0%, rgba(50,0,80,0.42) 100%);
+}
+
+/* APP SHELL */
+#app {
+  position: relative; z-index: 1;
+  height: 100dvh; display: flex; flex-direction: column;
+  max-width: 520px; margin: 0 auto; overflow: hidden;
+}
+
+/* TABS */
+#tabs { display: flex; gap: 6px; padding: 14px 14px 0; flex-shrink: 0; }
+.tab-btn {
+  flex: 1; padding: 10px 6px;
+  border: 2px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-radius: 14px 14px 0 0;
+  color: rgba(255,255,255,0.7);
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tab-btn.active { background: rgba(255,255,255,0.32); color: #fff; border-color: rgba(255,255,255,0.6); }
+.tab-btn .tab-pts { font-family: "Nunito", sans-serif; font-size: 0.72rem; font-weight: 800; opacity: 0.9; }
+
+/* MAIN CARD */
+#main-card {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 2px solid var(--glass-border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  margin: 0 14px 14px;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 16px 14px 100px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+/* AVATAR HEADER */
+.girl-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar-wrap { position: relative; width: 68px; height: 68px; flex-shrink: 0; }
+.avatar-circle {
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; cursor: pointer; transition: transform 0.2s; overflow: hidden;
+}
+.avatar-circle:active { transform: scale(0.92); }
+.avatar-edit-hint {
+  position: absolute; bottom: -2px; right: -2px;
+  background: var(--pink); border-radius: 50%;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; border: 2px solid white;
+}
+.girl-title { flex: 1; }
+.girl-name { font-family: "Fredoka One", cursive; font-size: 1.8rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3); line-height: 1; }
+.girl-points { font-size: 1rem; font-weight: 800; color: rgba(255,255,255,0.9); margin-top: 2px; }
+.week-badge {
+  background: rgba(255,255,255,0.22); border: 1.5px solid rgba(255,255,255,0.4);
+  border-radius: 10px; padding: 6px 10px; text-align: center;
+  font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.9); white-space: nowrap;
+}
+
+/* CATEGORY */
+.cat-section { margin-bottom: 18px; }
+.cat-label {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+  color: rgba(255,255,255,0.95);
+}
+.cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* TASK BUTTON */
+.task-btn {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; margin-bottom: 8px;
+  border: 2px solid rgba(255,255,255,0.28); border-radius: 16px;
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  cursor: pointer; transition: all 0.18s;
+  color: #fff; text-align: left;
+  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
+  position: relative; overflow: hidden;
+}
+.task-btn.chores   { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.15); }
+.task-btn.academic { border-color: rgba(59,130,246,0.45);  background: rgba(59,130,246,0.15); }
+.task-btn.exercise { border-color: rgba(34,197,94,0.45);   background: rgba(34,197,94,0.15); }
+.task-btn.music    { border-color: rgba(168,85,247,0.45);  background: rgba(168,85,247,0.15); }
+.task-btn.done { opacity: 0.55; background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.15) !important; text-decoration: line-through; }
+.task-btn:active { transform: scale(0.97); }
+.check-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.5);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 1rem; transition: all 0.2s;
+}
+.task-btn.done .check-circle { background: rgba(34,197,94,0.7); border-color: #22c55e; }
+.task-name { flex: 1; }
+.task-pts-badge {
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 800;
+  background: rgba(255,255,255,0.2); color: #fff; white-space: nowrap;
+}
+
+/* REWARDS */
+.rewards-section { margin-top: 10px; }
+.rewards-label {
+  font-family: "Fredoka One", cursive; font-size: 1.1rem;
+  color: rgba(255,255,255,0.95); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.reward-card {
+  margin-bottom: 10px;
+  border: 2px solid rgba(255,215,0,0.3); border-radius: 18px;
+  background: rgba(255,215,0,0.08);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.reward-card.can-redeem { border-color: rgba(255,215,0,0.65); }
+.reward-top {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px 8px;
+  color: #fff;
+}
+.reward-icon { font-size: 1.4rem; flex-shrink: 0; }
+.reward-name { flex: 1; font-size: 0.95rem; font-weight: 700; }
+.reward-cost { font-size: 0.8rem; font-weight: 800; color: rgba(255,215,0,0.9); white-space: nowrap; }
+
+/* REWARD PROGRESS BAR AREA */
+.reward-progress-wrap { padding: 0 14px 10px; }
+.reward-progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 5px;
+}
+.reward-deposited { font-size: 0.78rem; font-weight: 800; color: rgba(255,255,255,0.75); }
+.reward-pct { font-size: 0.78rem; font-weight: 800; color: rgba(255,215,0,0.85); }
+.reward-bar-bg {
+  height: 10px; border-radius: 10px;
+  background: rgba(255,255,255,0.15); overflow: hidden;
+  margin-bottom: 8px;
+}
+.reward-bar-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(90deg, #f59e0b, #ffe066);
+  transition: width 0.5s ease;
+}
+.reward-actions { display: flex; gap: 6px; }
+.deposit-btn {
+  flex: 1; padding: 7px 8px; border-radius: 12px; border: none;
+  background: rgba(255,255,255,0.15); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.8rem;
+  cursor: pointer; transition: background 0.15s;
+}
+.deposit-btn:active { background: rgba(255,255,255,0.28); }
+.redeem-btn {
+  padding: 7px 14px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #fff; font-family: "Fredoka One", cursive; font-size: 0.85rem;
+  cursor: pointer; animation: pulse-redeem 1.5s infinite; white-space: nowrap;
+}
+@keyframes pulse-redeem {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.6); }
+  50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+}
+
+/* CELEBRATION */
+#confetti-canvas { position: fixed; inset: 0; z-index: 999; pointer-events: none; }
+.celebration-pop {
+  position: fixed; z-index: 998; pointer-events: none;
+  font-size: 2.2rem; font-weight: 800; color: #ffe066;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  animation: pop-up 1.2s ease-out forwards;
+}
+@keyframes pop-up {
+  0%   { transform: scale(0.2) translateY(0); opacity: 1; }
+  60%  { transform: scale(1.3) translateY(-60px); opacity: 1; }
+  100% { transform: scale(1) translateY(-120px); opacity: 0; }
+}
+
+/* DASHBOARD */
+#dashboard-view { display: none; padding: 16px 14px 80px; overflow-y: auto; flex: 1; }
+#dashboard-view.active { display: block; }
+.dash-title {
+  font-family: "Fredoka One", cursive; font-size: 1.5rem; color: #fff;
+  text-align: center; margin-bottom: 18px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.dash-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.dash-card {
+  background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 20px; padding: 16px 12px; text-align: center;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.dash-card-name { font-family: "Fredoka One", cursive; font-size: 1.2rem; color: #fff; margin-bottom: 4px; }
+.dash-card-pts { font-size: 2.2rem; font-weight: 800; color: #ffe066; font-family: "Fredoka One", cursive; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.dash-card-label { font-size: 0.72rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+.dash-progress { height: 8px; border-radius: 10px; background: rgba(255,255,255,0.18); margin: 10px 0 6px; overflow: hidden; }
+.dash-progress-bar { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #22c55e, #86efac); transition: width 0.4s ease; }
+.dash-tasks-done { font-size: 0.8rem; color: rgba(255,255,255,0.8); font-weight: 700; }
+.dash-history {
+  background: rgba(255,255,255,0.13); border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 20px; padding: 14px 16px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.dash-history-title { font-family: "Fredoka One", cursive; font-size: 1rem; color: #fff; margin-bottom: 10px; }
+.history-entry {
+  font-size: 0.82rem; color: rgba(255,255,255,0.8); font-weight: 600;
+  padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; gap: 8px;
+}
+.history-entry:last-child { border-bottom: none; }
+.history-who { color: #ffb3e6; font-weight: 800; min-width: 55px; }
+.history-time { color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-left: auto; }
+
+/* SETTINGS */
+#settings-view { display: none; padding: 16px 14px 80px; overflow-y: auto; flex: 1; }
+#settings-view.active { display: block; }
+.settings-section {
+  background: rgba(255,255,255,0.14); border: 2px solid rgba(255,255,255,0.28);
+  border-radius: 20px; padding: 16px; margin-bottom: 14px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.settings-title { font-family: "Fredoka One", cursive; font-size: 1rem; color: #fff; margin-bottom: 12px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.settings-label { font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.9); }
+.settings-btn {
+  padding: 7px 16px; border-radius: 20px; border: none;
+  background: rgba(255,255,255,0.22); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.85rem;
+  cursor: pointer; transition: background 0.2s;
+}
+.settings-btn:active { background: rgba(255,255,255,0.35); }
+.settings-btn.danger { background: rgba(239,68,68,0.4); }
+
+/* BG PICKER */
+.bg-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.bg-swatch {
+  width: 52px; height: 52px; border-radius: 12px;
+  border: 2.5px solid transparent; cursor: pointer; overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+  background-size: cover; background-position: center;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 3px;
+}
+.bg-swatch.selected { border-color: #fff; transform: scale(1.08); }
+.bg-swatch:active { transform: scale(0.95); }
+.bg-swatch-label { font-size: 0.55rem; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+/* AVATAR MODAL */
+#avatar-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+}
+#avatar-modal.open { display: flex; }
+.avatar-modal-card {
+  background: rgba(40,0,80,0.92); border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 24px; padding: 24px; width: 320px; max-width: 90vw;
+}
+.avatar-modal-title { font-family: "Fredoka One", cursive; color: #fff; font-size: 1.2rem; margin-bottom: 14px; text-align: center; }
+.emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; }
+.emoji-opt {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: rgba(255,255,255,0.12); border: 2px solid transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; cursor: pointer; transition: all 0.15s;
+}
+.emoji-opt:active { transform: scale(0.88); }
+.emoji-opt.selected { border-color: #f59e0b; background: rgba(245,158,11,0.25); }
+.modal-close {
+  width: 100%; padding: 10px; border-radius: 14px; border: none;
+  background: rgba(255,255,255,0.18); color: #fff;
+  font-family: "Fredoka One", cursive; font-size: 1rem; cursor: pointer;
+}
+
+/* DEPOSIT MODAL */
+#deposit-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+}
+#deposit-modal.open { display: flex; }
+.deposit-card {
+  background: rgba(30,0,70,0.95); border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 24px; padding: 26px 22px; width: 310px; max-width: 90vw;
+}
+.deposit-card h2 { font-family: "Fredoka One", cursive; color: #fff; font-size: 1.3rem; margin-bottom: 4px; text-align: center; }
+.deposit-card .d-icon { font-size: 2.5rem; text-align: center; margin-bottom: 6px; }
+.deposit-avail { font-size: 0.88rem; font-weight: 800; color: rgba(255,215,0,0.85); text-align: center; margin-bottom: 14px; }
+.deposit-amounts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; justify-content: center; }
+.d-amt-btn {
+  padding: 8px 14px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.12); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.d-amt-btn.selected { border-color: #f59e0b; background: rgba(245,158,11,0.3); }
+.d-amt-btn:disabled { opacity: 0.35; cursor: default; }
+.deposit-actions { display: flex; gap: 8px; }
+.deposit-actions button {
+  flex: 1; padding: 11px; border-radius: 14px; border: none;
+  font-family: "Fredoka One", cursive; font-size: 1rem; cursor: pointer;
+}
+.d-confirm { background: linear-gradient(135deg, #f59e0b, #22c55e); color: #fff; }
+.d-cancel { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* REDEEM / RESET MODALS */
+#redeem-modal, #reset-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+}
+#redeem-modal.open, #reset-modal.open { display: flex; }
+.redeem-card {
+  background: rgba(40,0,80,0.92); border: 2px solid rgba(255,215,0,0.4);
+  border-radius: 24px; padding: 28px 24px; width: 300px; max-width: 90vw; text-align: center;
+}
+.redeem-card h2 { font-family: "Fredoka One", cursive; color: #fff; font-size: 1.4rem; margin-bottom: 8px; }
+.redeem-card p { color: rgba(255,255,255,0.8); font-size: 0.95rem; font-weight: 600; margin-bottom: 20px; }
+.redeem-actions { display: flex; gap: 10px; }
+.redeem-actions button {
+  flex: 1; padding: 12px; border-radius: 14px; border: none;
+  font-family: "Fredoka One", cursive; font-size: 1rem; cursor: pointer;
+}
+.redeem-confirm { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
+.redeem-cancel  { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* BOTTOM NAV */
+#bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 520px;
+  display: flex;
+  background: rgba(20,0,50,0.82);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-top: 1.5px solid rgba(255,255,255,0.18);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; padding: 10px 4px 8px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  cursor: pointer; transition: color 0.2s;
+}
+.nav-btn.active { color: #fff; }
+.nav-btn span { font-size: 0.65rem; font-weight: 800; font-family: "Nunito", sans-serif; }
+
+/* ===== DAILY CHORE BANNER ===== */
+.daily-chore-section {
+  margin-bottom: 18px;
+}
+.daily-chore-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(239,68,68,0.18));
+  border: 2px solid rgba(245,158,11,0.5);
+  border-radius: 18px;
+  padding: 14px 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 8px;
+}
+.daily-chore-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.daily-chore-day {
+  font-family: "Fredoka One", cursive;
+  font-size: 0.85rem; color: rgba(255,215,0,0.9);
+  background: rgba(255,215,0,0.15);
+  padding: 3px 10px; border-radius: 20px;
+  border: 1px solid rgba(255,215,0,0.3);
+}
+.daily-chore-title {
+  font-family: "Fredoka One", cursive;
+  font-size: 1rem; color: #fff;
+}
+
+/* ===== BONUS TASK ===== */
+.bonus-section { margin-bottom: 18px; }
+.bonus-label {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  color: rgba(255,255,255,0.95); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 7px;
+}
+.bonus-dot { width: 10px; height: 10px; border-radius: 50%; background: #ec4899; flex-shrink: 0; }
+.bonus-input-row {
+  display: flex; gap: 8px; margin-bottom: 8px; align-items: stretch;
+}
+.bonus-task-input {
+  flex: 1; padding: 11px 14px;
+  border-radius: 14px; border: 2px solid rgba(236,72,153,0.35);
+  background: rgba(236,72,153,0.12);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fff; font-family: "Nunito", sans-serif;
+  font-size: 0.95rem; font-weight: 700;
+  outline: none;
+}
+.bonus-task-input::placeholder { color: rgba(255,255,255,0.4); font-weight: 600; }
+.bonus-task-input:focus { border-color: rgba(236,72,153,0.7); }
+.bonus-pts-input {
+  width: 64px; padding: 11px 10px;
+  border-radius: 14px; border: 2px solid rgba(236,72,153,0.35);
+  background: rgba(236,72,153,0.12);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fff; font-family: "Nunito", sans-serif;
+  font-size: 0.95rem; font-weight: 800; text-align: center;
+  outline: none;
+}
+.bonus-pts-input:focus { border-color: rgba(236,72,153,0.7); }
+.bonus-add-btn {
+  padding: 11px 16px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  color: #fff; font-family: "Fredoka One", cursive;
+  font-size: 1rem; cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.bonus-add-btn:active { opacity: 0.75; }
+.bonus-task-btn {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; margin-bottom: 8px;
+  border: 2px solid rgba(236,72,153,0.35); border-radius: 16px;
+  background: rgba(236,72,153,0.13);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  cursor: pointer; transition: all 0.18s;
+  color: #fff; text-align: left;
+  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
+  position: relative;
+}
+.bonus-task-btn.done {
+  opacity: 0.55; background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.15) !important; text-decoration: line-through;
+}
+.bonus-task-btn:active { transform: scale(0.97); }
+.bonus-delete {
+  background: none; border: none; color: rgba(255,255,255,0.4);
+  font-size: 1rem; cursor: pointer; padding: 2px 6px;
+  transition: color 0.15s; flex-shrink: 0;
+}
+.bonus-delete:active { color: #ef4444; }
+
+/* ===== CALENDAR SECTION ===== */
+.cal-section {
+  background: rgba(255,255,255,0.13);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 20px; padding: 16px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.cal-title {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  color: #fff; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.cal-url-input {
+  width: 100%; padding: 10px 14px;
+  border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff; font-family: "Nunito", sans-serif;
+  font-size: 0.85rem; font-weight: 600; outline: none;
+  margin-bottom: 8px;
+}
+.cal-url-input::placeholder { color: rgba(255,255,255,0.35); }
+.cal-url-input:focus { border-color: rgba(255,255,255,0.45); }
+.cal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.cal-btn {
+  padding: 8px 16px; border-radius: 12px; border: none;
+  background: rgba(255,255,255,0.18); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.85rem;
+  cursor: pointer; transition: background 0.15s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.cal-btn:active { background: rgba(255,255,255,0.3); }
+.cal-btn.primary { background: linear-gradient(135deg,#3b82f6,#6366f1); }
+.cal-events {
+  margin-top: 10px; max-height: 160px; overflow-y: auto;
+}
+.cal-event {
+  padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.cal-event:last-child { border-bottom: none; }
+.cal-event-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; flex-shrink: 0; margin-top: 4px; }
+.cal-event-time { color: rgba(255,255,255,0.45); font-size: 0.75rem; white-space: nowrap; }
+.cal-status { font-size: 0.78rem; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 6px; }
+
+/* ============================================================
+   MAMA VIEW
+   ============================================================ */
+
+/* Reset focus banner */
+.reset-focus-banner {
+  background: linear-gradient(135deg, rgba(167,139,250,0.25), rgba(236,72,153,0.18));
+  border: 2px solid rgba(167,139,250,0.45);
+  border-radius: 20px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.reset-week-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(167,139,250,0.25);
+  border: 1.5px solid rgba(167,139,250,0.5);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.72rem; font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 8px;
+}
+.reset-theme {
+  font-family: "Fredoka One", cursive;
+  font-size: 1.15rem; color: #fff;
+  margin-bottom: 4px;
+}
+.reset-scripture {
+  font-size: 0.8rem; font-style: italic;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5; margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(167,139,250,0.5);
+}
+.reset-prompt {
+  font-size: 0.82rem; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 10px 12px;
+  line-height: 1.5;
+}
+.reset-progress-row {
+  display: flex; gap: 6px; margin-top: 10px;
+  flex-wrap: wrap;
+}
+.reset-week-pip {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 800;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reset-week-pip.current {
+  border-color: #a855f7;
+  background: rgba(168,85,247,0.3);
+  color: #fff;
+}
+.reset-week-pip.done {
+  background: rgba(34,197,94,0.4);
+  border-color: #22c55e;
+  color: #fff;
+}
+
+/* Intention field */
+.intention-section { margin-bottom: 18px; }
+.intention-label {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  color: rgba(255,255,255,0.95); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 7px;
+}
+.intention-input {
+  width: 100%; padding: 13px 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(167,139,250,0.35);
+  background: rgba(167,139,250,0.1);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-family: "Nunito", sans-serif; font-size: 0.95rem; font-weight: 700;
+  outline: none; resize: none;
+  min-height: 60px;
+  line-height: 1.5;
+}
+.intention-input::placeholder { color: rgba(255,255,255,0.35); font-weight: 600; }
+.intention-input:focus { border-color: rgba(167,139,250,0.65); }
+
+/* Mama task sections */
+.mama-section { margin-bottom: 18px; }
+.mama-section-label {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  color: rgba(255,255,255,0.95); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mama-task-btn {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; margin-bottom: 8px;
+  border: 2px solid rgba(255,255,255,0.2); border-radius: 16px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  cursor: pointer; transition: all 0.18s;
+  color: #fff; text-align: left;
+  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
+  position: relative; overflow: hidden;
+}
+.mama-task-btn.morning { border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.1); }
+.mama-task-btn.evening { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.1); }
+.mama-task-btn.weekly  { border-color: rgba(52,211,153,0.4); background: rgba(52,211,153,0.1); }
+.mama-task-btn.reset-habit { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.1); }
+.mama-task-btn.done {
+  opacity: 0.5;
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  text-decoration: line-through;
+}
+.mama-task-btn:active { transform: scale(0.97); }
+.mama-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 0.9rem; transition: all 0.2s;
+}
+.mama-task-btn.done .mama-check {
+  background: rgba(34,197,94,0.7); border-color: #22c55e;
+}
+.mama-task-name { flex: 1; }
+
+/* Habit streak dots */
+.streak-section { margin-bottom: 18px; }
+.streak-label {
+  font-family: "Fredoka One", cursive; font-size: 1rem;
+  color: rgba(255,255,255,0.95); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 7px;
+}
+.streak-grid {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 18px; padding: 14px 16px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.streak-task-row {
+  display: flex; align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.streak-task-row:last-child { margin-bottom: 0; }
+.streak-task-name {
+  font-size: 0.78rem; font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  width: 120px; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.streak-dots {
+  display: flex; gap: 5px; flex: 1;
+}
+.streak-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 800; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.streak-dot.done    { background: rgba(34,197,94,0.7); border-color: #22c55e; color: #fff; }
+.streak-dot.missed  { background: rgba(239,68,68,0.4); border-color: #ef4444; color: rgba(255,255,255,0.6); }
+.streak-dot.today   { border-color: rgba(255,215,0,0.8); background: rgba(255,215,0,0.15); }
+.streak-dot.future  { opacity: 0.25; }
+.streak-day-label   { font-size: 0.55rem; font-weight: 800; color: rgba(255,255,255,0.45); }
+.streak-pct {
+  font-size: 0.72rem; font-weight: 800;
+  color: rgba(255,215,0,0.85);
+  width: 34px; text-align: right; flex-shrink: 0;
+}
+
+/* Weekly summary */
+.mama-summary-bar {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 16px; padding: 12px 16px;
+  margin-bottom: 18px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; gap: 14px;
+}
+.mama-summary-ring {
+  position: relative; width: 56px; height: 56px; flex-shrink: 0;
+}
+.mama-summary-ring svg { transform: rotate(-90deg); }
+.mama-summary-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Fredoka One", cursive; font-size: 0.95rem; color: #fff;
+}
+.mama-summary-text { flex: 1; }
+.mama-summary-title {
+  font-family: "Fredoka One", cursive; font-size: 1rem; color: #fff; margin-bottom: 2px;
+}
+.mama-summary-sub {
+  font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.65);
+}
+
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<div id="app">
+  <div id="tabs">
+    <button class="tab-btn active" data-girl="celia" onclick="switchGirl('celia')">
+      🌸 Celia
+      <span class="tab-pts" id="celia-tab-pts">0 pts</span>
+    </button>
+    <button class="tab-btn" data-girl="kata" onclick="switchGirl('kata')">
+      🌻 Kata
+      <span class="tab-pts" id="kata-tab-pts">0 pts</span>
+    </button>
+    <button class="tab-btn" data-girl="mama" onclick="switchGirl('mama')">
+      🌿 Mama
+      <span class="tab-pts" id="mama-tab-pts">0% done</span>
+    </button>
+  </div>
+
+  <div id="main-card">
+    <div id="celia-view"></div>
+    <div id="kata-view" style="display:none"></div>
+    <div id="mama-view" style="display:none"></div>
+  </div>
+
+  <div id="dashboard-view">
+    <div class="dash-title">⭐ Parent Dashboard</div>
+    <div class="dash-cards" id="dash-cards"></div>
+    <div class="dash-history" style="margin-bottom:14px">
+      <div class="dash-history-title">📅 Upcoming Events</div>
+      <div id="dash-cal-events"><div style="color:rgba(255,255,255,0.4);font-size:0.82rem;padding:6px 0">Add a calendar URL in Settings ⚙️</div></div>
+    </div>
+    <div class="dash-history">
+      <div class="dash-history-title">📋 Recent Activity</div>
+      <div id="dash-history-list"></div>
+    </div>
+  </div>
+
+  <div id="settings-view">
+    <div class="settings-section">
+      <div class="settings-title">🌸 Background Image</div>
+      <div class="bg-picker" id="bg-picker"></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">📅 Week Setting</div>
+      <div class="settings-row">
+        <span class="settings-label" id="week-display">Current Week: A</span>
+        <button class="settings-btn" onclick="toggleWeek()">Toggle Week</button>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Next auto-reset</span>
+        <span class="settings-label" id="next-reset-display" style="color:rgba(255,255,255,0.6);font-size:0.82rem"></span>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">🔄 Manual Reset</div>
+      <div class="settings-row">
+        <span class="settings-label">Clear all tasks for today</span>
+        <button class="settings-btn danger" onclick="openResetModal()">Reset Now</button>
+      </div>
+    </div>
+    <div class="cal-section settings-section" style="margin:0 0 14px">
+      <div class="cal-title">📅 Google Calendar Link</div>
+      <p style="font-size:0.8rem;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:10px;line-height:1.5">
+        Paste your Google Calendar's public iCal URL below. The app will fetch upcoming events and display them in the calendar panel.
+      </p>
+      <input class="cal-url-input" id="cal-url-input" type="url"
+        placeholder="https://calendar.google.com/calendar/ical/…/public/basic.ics"
+        value="">
+      <div class="cal-actions">
+        <button class="cal-btn primary" onclick="saveCalUrl()">💾 Save & Fetch</button>
+        <button class="cal-btn" onclick="fetchCalendar()">🔄 Refresh</button>
+        <a class="cal-btn" href="https://support.google.com/calendar/answer/37648" target="_blank">❓ How to get URL</a>
+      </div>
+      <div class="cal-status" id="cal-status"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">📊 Points (Parent Adjust)</div>
+      <div class="settings-row">
+        <span class="settings-label">Celia total</span>
+        <span class="settings-label" id="s-celia-pts" style="color:#ffe066">0</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Kata total</span>
+        <span class="settings-label" id="s-kata-pts" style="color:#ffe066">0</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Adjust Celia</span>
+        <div style="display:flex;gap:6px">
+          <button class="settings-btn" onclick="adjustPts('celia',-10)">−10</button>
+          <button class="settings-btn" onclick="adjustPts('celia',10)">+10</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Adjust Kata</span>
+        <div style="display:flex;gap:6px">
+          <button class="settings-btn" onclick="adjustPts('kata',-10)">−10</button>
+          <button class="settings-btn" onclick="adjustPts('kata',10)">+10</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bottom-nav">
+  <button class="nav-btn active" id="nav-celia" onclick="showView('girl'); switchGirl('celia')">🌸<span>Celia</span></button>
+  <button class="nav-btn" id="nav-kata"  onclick="showView('girl'); switchGirl('kata')">🌻<span>Kata</span></button>
+  <button class="nav-btn" id="nav-mama"  onclick="showView('girl'); switchGirl('mama')">🌿<span>Mama</span></button>
+  <button class="nav-btn" id="nav-dash"  onclick="showView('dashboard')">📊<span>Dashboard</span></button>
+  <button class="nav-btn" id="nav-settings" onclick="showView('settings')">⚙️<span>Settings</span></button>
+</div>
+
+<!-- Avatar Picker -->
+<div id="avatar-modal">
+  <div class="avatar-modal-card">
+    <div class="avatar-modal-title">Choose Your Avatar ✨</div>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <button class="modal-close" onclick="closeAvatarModal()">Done ✓</button>
+  </div>
+</div>
+
+<!-- Deposit Modal -->
+<div id="deposit-modal">
+  <div class="deposit-card">
+    <div class="d-icon" id="dep-icon">🏆</div>
+    <h2 id="dep-title">Save toward reward</h2>
+    <div class="deposit-avail" id="dep-avail"></div>
+    <div class="deposit-amounts" id="dep-amounts"></div>
+    <div class="deposit-actions">
+      <button class="d-cancel" onclick="closeDepositModal()">Cancel</button>
+      <button class="d-confirm" onclick="confirmDeposit()">Save ⭐</button>
+    </div>
+  </div>
+</div>
+
+<!-- Redeem Modal -->
+<div id="redeem-modal">
+  <div class="redeem-card">
+    <div style="font-size:2.5rem;margin-bottom:8px" id="redeem-icon">🎉</div>
+    <h2 id="redeem-title">Redeem Reward?</h2>
+    <p id="redeem-desc">Are you sure?</p>
+    <div class="redeem-actions">
+      <button class="redeem-cancel" onclick="closeRedeemModal()">Cancel</button>
+      <button class="redeem-confirm" onclick="confirmRedeem()">Yes! 🎉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Modal -->
+<div id="reset-modal">
+  <div class="redeem-card">
+    <div style="font-size:2.5rem;margin-bottom:8px">🔄</div>
+    <h2>Reset All Tasks?</h2>
+    <p>Unchecks all tasks. Points are kept.</p>
+    <div class="redeem-actions">
+      <button class="redeem-cancel" onclick="document.getElementById('reset-modal').classList.remove('open')">Cancel</button>
+      <button class="redeem-confirm" onclick="doReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// IMAGES (embedded)
+// ============================================================
+
+// ============================================================
+// BG OPTIONS
+// ============================================================
+const BG_SVG = {
+  flower: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900' viewBox='0 0 900 900'%3E%3Crect width='900' height='900' fill='%23c9a0dc'/%3E%3Ccircle cx='450' cy='450' r='440' fill='%23e8b4e8'/%3E%3Cg opacity='0.85'%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ff9fdd' transform='rotate(0 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ff9fdd' transform='rotate(45 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ffb3e6' transform='rotate(90 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ff9fdd' transform='rotate(135 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ffb3e6' transform='rotate(180 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ff9fdd' transform='rotate(225 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ffb3e6' transform='rotate(270 450 450)'/%3E%3Cellipse cx='450' cy='170' rx='90' ry='160' fill='%23ff9fdd' transform='rotate(315 450 450)'/%3E%3C/g%3E%3Ccircle cx='450' cy='450' r='110' fill='%23ffe066'/%3E%3Ccircle cx='450' cy='450' r='80' fill='%23ffcc00'/%3E%3Ccircle cx='450' cy='450' r='50' fill='%23ff9900'/%3E%3C/svg%3E")`,
+  summer: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Crect width='900' height='900' fill='%23ffb347'/%3E%3Ccircle cx='450' cy='450' r='300' fill='%23ffe066' opacity='0.7'/%3E%3Ccircle cx='450' cy='450' r='200' fill='%23fff176' opacity='0.8'/%3E%3Ccircle cx='450' cy='450' r='100' fill='%23fffde7'/%3E%3Cg stroke='%23ff9800' stroke-width='18' opacity='0.85'%3E%3Cline x1='450' y1='0' x2='450' y2='210'/%3E%3Cline x1='450' y1='690' x2='450' y2='900'/%3E%3Cline x1='0' y1='450' x2='210' y2='450'/%3E%3Cline x1='690' y1='450' x2='900' y2='450'/%3E%3Cline x1='148' y1='148' x2='300' y2='300'/%3E%3Cline x1='752' y1='148' x2='600' y2='300'/%3E%3Cline x1='148' y1='752' x2='300' y2='600'/%3E%3Cline x1='752' y1='752' x2='600' y2='600'/%3E%3C/g%3E%3C/svg%3E")`,
+  fall: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Crect width='900' height='900' fill='%238B4513'/%3E%3Ccircle cx='200' cy='200' r='160' fill='%23e55039' opacity='0.7'/%3E%3Ccircle cx='700' cy='300' r='120' fill='%23f39c12' opacity='0.65'/%3E%3Ccircle cx='450' cy='600' r='180' fill='%23d35400' opacity='0.6'/%3E%3Ccircle cx='100' cy='750' r='100' fill='%23c0392b' opacity='0.55'/%3E%3Ccircle cx='800' cy='700' r='130' fill='%23e67e22' opacity='0.6'/%3E%3C/svg%3E")`,
+  winter: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Crect width='900' height='900' fill='%23a8d8ea'/%3E%3Ccircle cx='450' cy='300' r='200' fill='white' opacity='0.4'/%3E%3Ccircle cx='200' cy='600' r='150' fill='white' opacity='0.3'/%3E%3Ccircle cx='750' cy='650' r='120' fill='white' opacity='0.3'/%3E%3Cg fill='white' opacity='0.6'%3E%3Ccircle cx='100' cy='100' r='6'/%3E%3Ccircle cx='300' cy='50' r='4'/%3E%3Ccircle cx='600' cy='80' r='5'/%3E%3Ccircle cx='800' cy='120' r='7'/%3E%3Ccircle cx='50' cy='400' r='5'/%3E%3Ccircle cx='850' cy='350' r='4'/%3E%3C/g%3E%3C/svg%3E")`,
+  rainbow: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Crect width='900' height='900' fill='%23fff0f5'/%3E%3Cellipse cx='450' cy='900' rx='800' ry='500' fill='none' stroke='%23ff6b9d' stroke-width='40' opacity='0.5'/%3E%3Cellipse cx='450' cy='900' rx='700' ry='430' fill='none' stroke='%23ff9f43' stroke-width='38' opacity='0.5'/%3E%3Cellipse cx='450' cy='900' rx='600' ry='360' fill='none' stroke='%23ffe066' stroke-width='36' opacity='0.5'/%3E%3Cellipse cx='450' cy='900' rx='500' ry='290' fill='none' stroke='%2355efc4' stroke-width='34' opacity='0.5'/%3E%3Cellipse cx='450' cy='900' rx='400' ry='220' fill='none' stroke='%2374b9ff' stroke-width='32' opacity='0.5'/%3E%3Cellipse cx='450' cy='900' rx='300' ry='150' fill='none' stroke='%23a29bfe' stroke-width='30' opacity='0.5'/%3E%3C/svg%3E")`,
+  night: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Crect width='900' height='900' fill='%230d0d2b'/%3E%3Ccircle cx='700' cy='180' r='80' fill='%23fff9c4' opacity='0.9'/%3E%3Ccircle cx='720' cy='160' r='70' fill='%230d0d2b'/%3E%3Cg fill='white'%3E%3Ccircle cx='100' cy='80' r='2'/%3E%3Ccircle cx='200' cy='150' r='2.5'/%3E%3Ccircle cx='50' cy='250' r='2'/%3E%3Ccircle cx='350' cy='50' r='3'/%3E%3Ccircle cx='500' cy='120' r='2'/%3E%3Ccircle cx='150' cy='350' r='2'/%3E%3Ccircle cx='800' cy='400' r='2.5'/%3E%3Ccircle cx='600' cy='700' r='2.5'/%3E%3C/g%3E%3C/svg%3E")`,
+};
+
+const BG_OPTIONS = [
+  { id: "flower",  label: "🌸 Spring",  svgKey: "flower",  previewGrad: "linear-gradient(135deg,#ffb3e6,#c9a0dc,#ffe066)" },
+  { id: "summer",  label: "☀️ Summer",  svgKey: "summer",  previewGrad: "linear-gradient(135deg,#ffe066,#ff9f43,#ff6b81)" },
+  { id: "fall",    label: "🍂 Fall",    svgKey: "fall",    previewGrad: "linear-gradient(135deg,#e55039,#f39c12,#8e5e3c)" },
+  { id: "winter",  label: "❄️ Winter",  svgKey: "winter",  previewGrad: "linear-gradient(135deg,#a8edea,#74b9ff,#dfe6e9)" },
+  { id: "rainbow", label: "🌈 Rainbow", svgKey: "rainbow", previewGrad: "linear-gradient(135deg,#ff9ff3,#ffeaa7,#55efc4,#74b9ff)" },
+  { id: "night",   label: "🌙 Night",   svgKey: "night",   previewGrad: "linear-gradient(135deg,#2d3561,#a239ca,#0d0d0d)" },
+];
+
+// ============================================================
+// AVATARS
+// ============================================================
+const AVATARS = ["🌸","🦄","🌈","🦋","🌺","🐱","🐶","🦊","🐼","🌟","⭐","🌙","🍭","🍓","🎀","🦚","🌊","🌿","🦁","🐨","🎠","🏵️","🌼","✨"];
+
+// ============================================================
+// TASK DATA
+// ============================================================
+const TASKS_CELIA = [
+  // Chores always
+  { id:"c_dish", name:"Unload dishwasher",    pts:1, cat:"chores",   week:null },
+  { id:"c_hyg",  name:"Hygiene",              pts:1, cat:"chores",   week:null },
+  { id:"c_bed",  name:"15-min bedroom reset", pts:1, cat:"chores",   week:null },
+  // Week A: Celia gets eggs + compost
+  { id:"c_eggs", name:"Collect eggs 🥚",      pts:1, cat:"chores",   week:"A"  },
+  { id:"c_comp", name:"Compost ♻️",           pts:1, cat:"chores",   week:"A"  },
+  // Week B: Celia gets dog poop + living room
+  { id:"c_dog",  name:"Dog poop 🐶",          pts:1, cat:"chores",   week:"B"  },
+  { id:"c_liv",  name:"Living room pick-up",  pts:1, cat:"chores",   week:"B"  },
+  // Academics
+  { id:"c_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
+  { id:"c_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
+  { id:"c_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
+  { id:"c_ice",  name:"Always Ice Cream 🍦",  pts:3, cat:"academic", week:null },
+  { id:"c_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
+  { id:"c_book", name:"Book study w/ Mom 📖", pts:2, cat:"academic", week:null },
+  // Exercise
+  { id:"c_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null },
+  { id:"c_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null },
+  // Music
+  { id:"c_music",name:"Music practice 🎵",    pts:4, cat:"music",    week:null },
+];
+
+const TASKS_KATA = [
+  { id:"k_dish", name:"Unload dishwasher",    pts:1, cat:"chores",   week:null },
+  { id:"k_hyg",  name:"Hygiene",              pts:1, cat:"chores",   week:null },
+  { id:"k_bed",  name:"15-min bedroom reset", pts:1, cat:"chores",   week:null },
+  // Week A: Kata gets dog poop + living room
+  { id:"k_dog",  name:"Dog poop 🐶",          pts:1, cat:"chores",   week:"A"  },
+  { id:"k_liv",  name:"Living room pick-up",  pts:1, cat:"chores",   week:"A"  },
+  // Week B: Kata gets eggs + compost
+  { id:"k_eggs", name:"Collect eggs 🥚",      pts:1, cat:"chores",   week:"B"  },
+  { id:"k_comp", name:"Compost ♻️",           pts:1, cat:"chores",   week:"B"  },
+  { id:"k_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
+  { id:"k_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
+  { id:"k_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
+  { id:"k_mon",  name:"Monarch 👑",            pts:3, cat:"academic", week:null },
+  { id:"k_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
+  { id:"k_book", name:"Book study w/ Mom 📖", pts:2, cat:"academic", week:null },
+  { id:"k_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null },
+  { id:"k_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null },
+  { id:"k_music",name:"Music practice 🎵",    pts:4, cat:"music",    week:null },
+];
+
+// Rewards — NO duplicates. Debit card only in SHARED.
+const SHARED_REWARDS = [
+  { id:"r_nochores", icon:"🏖️", name:"Day without chores",  pts:50  },
+  { id:"r_dessert",  icon:"🍧", name:"Dessert at the park",  pts:75  },
+  { id:"r_icecream", icon:"🍦", name:"JACZ Ice cream",        pts:100 },
+  { id:"r_hike",     icon:"🥾", name:"Hike and picnic",       pts:150 },
+  { id:"r_playdate", icon:"🏡", name:"Playdate at home",      pts:200 },
+  { id:"r_pool",     icon:"🏊", name:"Pool w/ friends",       pts:500 },
+  { id:"r_debit",    icon:"💳", name:"Debit card",            pts:1000},
+];
+
+// Girl-specific rewards — no debit card here
+const CELIA_REWARDS = [
+  { id:"rc_movie",  icon:"🎬", name:"Movie night pick",        pts:50  },
+  { id:"rc_fort",   icon:"🏰", name:"Trip to the Secret Fort", pts:125 },
+  { id:"rc_outing", icon:"✨", name:"Special outing",          pts:150 },
+];
+
+const KATA_REWARDS = [
+  { id:"rk_movie",  icon:"🎬", name:"Movie night pick", pts:50  },
+  { id:"rk_outing", icon:"✨", name:"Special outing",   pts:150 },
+];
+
+const CAT_COLORS = {
+  chores:   { dot:"#f59e0b", cls:"chores",   label:"🧹 Chores"   },
+  academic: { dot:"#3b82f6", cls:"academic",  label:"📚 Academics"},
+  exercise: { dot:"#22c55e", cls:"exercise",  label:"💪 Exercise" },
+  music:    { dot:"#a855f7", cls:"music",     label:"🎵 Music"    },
+};
+
+// MAMA DATA
+// ============================================================
+
+// 5-Week Dopamine Reset plan (each "day" = one week)
+const RESET_WEEKS = [
+  {
+    week: 1,
+    theme: "The Replacement Reset",
+    scripture: "Philippians 4:8 — \"Whatever is true, whatever is honorable, whatever is just, whatever is pure, whatever is lovely... think about these things.\"",
+    concept: "Replace the noise with what nourishes. Every time you reach for your phone, pause and replace it with something holy, good, or true.",
+    prompt: "Reflection: What situations trigger my phone reaching? How can I replace those moments with worship, gratitude, or Scripture instead?",
+    habitAdded: "📵 No phone first 30 min"
+  },
+  {
+    week: 2,
+    theme: "The Morning Reset",
+    scripture: "Psalm 143:8 — \"Let me hear in the morning of your steadfast love, for in you I trust. Make me know the way I should go.\"",
+    concept: "The first hour of your day sets the tone for your mind. Start with what nourishes your soul before touching anything that drains it.",
+    prompt: "Reflection: How does my day feel different when I start with Scripture instead of scrolling? What one small change can I make tomorrow morning?",
+    habitAdded: "📖 Bible 30 min — anchored as your very first priority"
+  },
+  {
+    week: 3,
+    theme: "The Evening Reset — Golden Hour",
+    scripture: "Psalm 4:8 — \"In peace I will both lie down and sleep; for You alone, O Lord, make me dwell in safety.\"",
+    concept: "The hour before bed is sacred. Keep your phone out of your bedroom. Fill that time with a Psalm, journaling one joy from the day, stretching, or prayer.",
+    prompt: "Reflection: What does my current nighttime routine communicate to my nervous system? How could I signal to my brain that peace is safe and good again?",
+    habitAdded: "🌙 Golden Hour — phone-free wind-down before bed"
+  },
+  {
+    week: 4,
+    theme: "The Boundary Reset",
+    scripture: "Proverbs 4:23 — \"Keep your heart with all vigilance, for from it flow the springs of life.\"",
+    concept: "Audit your app traps. Some are obvious timewasters; others pretend to be productive while draining your peace. You are the gatekeeper of your attention.",
+    prompt: "Reflection: Which boundary feels hardest to set — and what fear might be behind that resistance? Pray for courage to release that fear.",
+    habitAdded: "✋ Phone only at designated check-in times"
+  },
+  {
+    week: 5,
+    theme: "The Two-Hour Limit Reset",
+    scripture: "Ephesians 5:15–16 — \"Look carefully then how you walk, not as unwise but as wise, making the best use of the time.\"",
+    concept: "Create visiting hours — one hour in the morning, one in the evening — for all messages, emails, and social. The rest of the day, let your phone rest too.",
+    prompt: "Reflection: What difference do I feel when I live in the quiet space between notifications?",
+    habitAdded: "⏱️ Two structured phone windows — morning & evening only"
+  }
+];
+
+// Mama daily tasks
+const MAMA_MORNING_TASKS = [
+  { id:"m_nophone",    name:"📵 No phone first 30 min",         cat:"morning" },
+  { id:"m_hygiene",    name:"🚿 Hygiene",                       cat:"morning" },
+  { id:"m_vitamins",   name:"💊 Vitamins/supplements",          cat:"morning" },
+  { id:"m_bible",      name:"📖 Bible (30 min)",                cat:"morning" },
+  { id:"m_walk",       name:"🚶 Walk",                          cat:"morning" },
+  { id:"m_intention",  name:"💭 Write daily intention",         cat:"morning" },
+];
+
+const MAMA_DAILY_TASKS = [
+  { id:"m_lesson",     name:"📚 Teach a lesson",                cat:"daily" },
+  { id:"m_dishes",     name:"🍽️ Dishes",                        cat:"daily" },
+  { id:"m_bed",        name:"🛏️ Make bed / 10-min bedroom tidy",cat:"daily" },
+  { id:"m_laundry",    name:"🧺 One load of laundry",           cat:"daily" },
+  { id:"m_connect",    name:"💬 Connect with each girl",        cat:"daily" },
+  { id:"m_gratitude",  name:"🙏 Gratitude — write 3 things",    cat:"daily" },
+];
+
+// Mama weekly rotation
+const MAMA_WEEKLY = {
+  0: { name:"🗓️ Weekly Review & Reset",       note:"Plan the week ahead — review, pray, prepare" },
+  1: { name:"🧹 Deep Clean — Kitchen & Main Floor", note:"Wipe surfaces, mop, declutter main living spaces" },
+  2: { name:"📚 Homeschool Prep & Planning",  note:"Lessons, supplies, schedule for the week" },
+  3: { name:"🛒 Grocery List & Meal Planning",note:"Plan meals, check pantry, build shopping list" },
+  4: { name:"📋 Admin & Paperwork",           note:"Bills, emails, scheduling, anything on the back burner" },
+  5: { name:"🌿 Yard / Garden / Outdoor",     note:"Tend the outside — garden, chickens area, yard" },
+  6: { name:"🧹 Deep Clean — Bedrooms & Bathrooms", note:"Thorough clean of all sleeping and bath spaces" },
+};
+
+// All mama task IDs for streak tracking
+function getAllMamaTasks() {
+  return [...MAMA_MORNING_TASKS, ...MAMA_DAILY_TASKS];
+}
+
+// Clear mama tasks daily alongside girls
+const _origReset = checkDailyReset;
+
+// ── MAMA RENDER ────────────────────────────────────────────
+function renderMamaView() {
+  const el = document.getElementById("mama-view");
+  if (!el) return;
+
+  const done = STATE.mamaDone;
+  const allTasks = getAllMamaTasks();
+  const totalToday = allTasks.length + 1; // +1 for weekly
+  const doneToday  = allTasks.filter(t => done[t.id]).length
+                   + (done["m_weekly"] ? 1 : 0);
+  const pct = totalToday ? Math.round(doneToday / totalToday * 100) : 0;
+
+  // Reset focus banner
+  const rw = RESET_WEEKS[(STATE.mamaResetWeek || 1) - 1] || RESET_WEEKS[0];
+  const pipHTML = RESET_WEEKS.map((w,i) => {
+    const wk = i + 1;
+    const cls = wk < STATE.mamaResetWeek ? "done"
+              : wk === STATE.mamaResetWeek ? "current" : "";
+    return `<div class="reset-week-pip ${cls}" onclick="setResetWeek(${wk})" title="Week ${wk}: ${w.theme}">${wk}</div>`;
+  }).join("");
+
+  const resetHTML = `<div class="reset-focus-banner">
+    <div class="reset-week-badge">🌿 Week ${rw.week} of 5 — Dopamine Reset</div>
+    <div class="reset-theme">${rw.theme}</div>
+    <div class="reset-scripture">${rw.scripture}</div>
+    <div class="reset-prompt">${rw.prompt}</div>
+    <div class="reset-progress-row">${pipHTML}</div>
+  </div>`;
+
+  // Daily intention
+  const today = new Date().toDateString();
+  const intentionVal = STATE.mamaIntentionDate === today ? STATE.mamaIntention : "";
+  const intentionHTML = `<div class="intention-section">
+    <div class="intention-label">💭 Today's Intention</div>
+    <textarea class="intention-input" id="mama-intention-input"
+      placeholder="What is one thing I want to be intentional about today…"
+      onchange="saveMamaIntention(this.value)"
+      onblur="saveMamaIntention(this.value)">${intentionVal}</textarea>
+  </div>`;
+
+  // Summary ring
+  const r = 24; const circ = 2 * Math.PI * r;
+  const dashOffset = circ - (pct / 100 * circ);
+  const summaryHTML = `<div class="mama-summary-bar">
+    <div class="mama-summary-ring">
+      <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r="${r}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="5"/>
+        <circle cx="28" cy="28" r="${r}" fill="none" stroke="#a855f7" stroke-width="5"
+          stroke-dasharray="${circ.toFixed(1)}"
+          stroke-dashoffset="${dashOffset.toFixed(1)}"
+          stroke-linecap="round"/>
+      </svg>
+      <div class="mama-summary-pct">${pct}%</div>
+    </div>
+    <div class="mama-summary-text">
+      <div class="mama-summary-title">Today's Progress</div>
+      <div class="mama-summary-sub">${doneToday} of ${totalToday} tasks complete</div>
+      <div class="mama-summary-sub" style="margin-top:3px;color:rgba(255,215,0,0.8)">${rw.habitAdded}</div>
+    </div>
+  </div>`;
+
+  // Weekly chore
+  const dayOfWeek = new Date().getDay();
+  const weeklyChore = MAMA_WEEKLY[dayOfWeek];
+  const wDone = !!done["m_weekly"];
+  const weeklyHTML = `<div class="mama-section">
+    <div class="mama-section-label" style="color:rgba(52,211,153,0.95)">📅 Today's Weekly Focus</div>
+    <button class="mama-task-btn weekly ${wDone?"done":""}" onclick="toggleMamaTask('m_weekly', this)">
+      <span class="mama-check">${wDone?"✓":""}</span>
+      <span class="mama-task-name">
+        <strong>${weeklyChore.name}</strong><br>
+        <span style="font-size:0.78rem;font-weight:600;opacity:0.7">${weeklyChore.note}</span>
+      </span>
+    </button>
+  </div>`;
+
+  // Morning tasks
+  let morningHTML = `<div class="mama-section">
+    <div class="mama-section-label" style="color:rgba(251,191,36,0.95)">🌅 Morning Routine</div>`;
+  MAMA_MORNING_TASKS.forEach(t => {
+    const isDone = !!done[t.id];
+    morningHTML += `<button class="mama-task-btn morning ${isDone?"done":""}" onclick="toggleMamaTask('${t.id}', this)">
+      <span class="mama-check">${isDone?"✓":""}</span>
+      <span class="mama-task-name">${t.name}</span>
+    </button>`;
+  });
+  morningHTML += `</div>`;
+
+  // Daily tasks
+  let dailyHTML = `<div class="mama-section">
+    <div class="mama-section-label" style="color:rgba(255,255,255,0.9)">☀️ Daily Tasks</div>`;
+  MAMA_DAILY_TASKS.forEach(t => {
+    const isDone = !!done[t.id];
+    dailyHTML += `<button class="mama-task-btn ${isDone?"done":""}" onclick="toggleMamaTask('${t.id}', this)">
+      <span class="mama-check">${isDone?"✓":""}</span>
+      <span class="mama-task-name">${t.name}</span>
+    </button>`;
+  });
+  dailyHTML += `</div>`;
+
+  // Habit streak (last 7 days including today)
+  const streakHTML = buildMamaStreakHTML();
+
+  el.innerHTML = resetHTML + intentionHTML + summaryHTML + weeklyHTML + morningHTML + dailyHTML + streakHTML;
+
+  // Update tab display
+  document.getElementById("mama-tab-pts").textContent = pct + "% done";
+}
+
+function buildMamaStreakHTML() {
+  const allTasks = getAllMamaTasks();
+  const today = new Date();
+  // Build 7 days: Mon-Sun of current week, or last 7 days
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d);
+  }
+  const dayLabels = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+  // Header row of day labels
+  const headerDots = days.map(d => {
+    const isToday = d.toDateString() === today.toDateString();
+    return `<div class="streak-dot ${isToday?"today":"future"}" style="font-size:0.55rem;height:18px;width:22px;border-radius:6px">
+      ${dayLabels[d.getDay()]}
+    </div>`;
+  }).join("");
+
+  let rows = `<div class="streak-task-row">
+    <div class="streak-task-name" style="opacity:0.5;font-size:0.7rem">Task</div>
+    <div class="streak-dots">${headerDots}</div>
+    <div class="streak-pct" style="font-size:0.65rem;color:rgba(255,255,255,0.4)">Week</div>
+  </div>`;
+
+  // Show top daily tasks in streak (keep to 8 for space)
+  const trackTasks = allTasks.slice(0, 8);
+  trackTasks.forEach(t => {
+    let weekDone = 0;
+    const dots = days.map(d => {
+      const dateStr = d.toDateString();
+      const isToday = dateStr === today.toDateString();
+      const isFuture = d > today;
+      // Look up history
+      const histEntry = STATE.mamaHistory.find(h => h.date === dateStr && h.taskId === t.id);
+      const wasDone = isToday ? !!STATE.mamaDone[t.id]
+                   : histEntry ? histEntry.done : false;
+      if (wasDone) weekDone++;
+      const cls = isFuture ? "future"
+                : wasDone ? "done"
+                : isToday ? "today"
+                : "missed";
+      return `<div class="streak-dot ${cls}">${wasDone?"✓":""}</div>`;
+    }).join("");
+    const weekPct = Math.round(weekDone / 7 * 100);
+    const shortName = t.name.replace(/^[^\s]+\s/, "").substring(0, 16);
+    rows += `<div class="streak-task-row">
+      <div class="streak-task-name">${shortName}</div>
+      <div class="streak-dots">${dots}</div>
+      <div class="streak-pct">${weekPct}%</div>
+    </div>`;
+  });
+
+  return `<div class="streak-section">
+    <div class="streak-label">🔥 7-Day Habit Tracker</div>
+    <div class="streak-grid">${rows}</div>
+  </div>`;
+}
+
+function toggleMamaTask(taskId, btn) {
+  const done = STATE.mamaDone;
+  const today = new Date().toDateString();
+  if (done[taskId]) {
+    done[taskId] = false;
+    // Update history
+    const h = STATE.mamaHistory.find(x => x.date === today && x.taskId === taskId);
+    if (h) h.done = false;
+  } else {
+    done[taskId] = true;
+    // Record in history
+    const existing = STATE.mamaHistory.find(x => x.date === today && x.taskId === taskId);
+    if (existing) existing.done = true;
+    else STATE.mamaHistory.push({ date: today, taskId, done: true });
+    // Gentle celebration — no confetti, just a soft pop
+    mamaCelebrate(btn);
+  }
+  saveState();
+  renderMamaView();
+}
+
+function mamaCelebrate(btn) {
+  const emojis = ["🌸","✨","🙏","💜","🌿","⭐","🦋","🌷"];
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement("div");
+  pop.className = "celebration-pop";
+  pop.style.fontSize = "1.8rem";
+  pop.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  pop.style.left = (rect.left + rect.width / 2 - 20) + "px";
+  pop.style.top  = rect.top + "px";
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 1200);
+}
+
+function saveMamaIntention(val) {
+  STATE.mamaIntention = val;
+  STATE.mamaIntentionDate = new Date().toDateString();
+  saveState();
+}
+
+function setResetWeek(w) {
+  STATE.mamaResetWeek = w;
+  saveState();
+  renderMamaView();
+}
+
+// ── HOOK INTO DAILY RESET ──────────────────────────────────
+const _origCheckDailyReset = checkDailyReset;
+function checkDailyReset() {
+  const today = new Date().toDateString();
+  if (STATE.lastReset !== today) {
+    STATE.celiaDone = {};
+    STATE.kataDone  = {};
+    // Save mama done to history before clearing
+    if (STATE.mamaDone && STATE.lastReset) {
+      const allIds = [...getAllMamaTasks().map(t=>t.id), "m_weekly"];
+      allIds.forEach(id => {
+        const alreadyLogged = STATE.mamaHistory.find(h => h.date === STATE.lastReset && h.taskId === id);
+        if (!alreadyLogged) {
+          STATE.mamaHistory.push({ date: STATE.lastReset, taskId: id, done: !!STATE.mamaDone[id] });
+        }
+      });
+    }
+    STATE.mamaDone  = {};
+    STATE.lastReset = today;
+    // Cap history at 90 days
+    if (STATE.mamaHistory.length > 90 * 20) {
+      STATE.mamaHistory = STATE.mamaHistory.slice(-90 * 20);
+    }
+    saveState();
+  }
+}
+
+
+// ============================================================
+// STATE
+// ============================================================
+function loadState() {
+  try { return JSON.parse(localStorage.getItem("hs_state") || "{}"); }
+  catch(e) { return {}; }
+}
+function saveState() { localStorage.setItem("hs_state", JSON.stringify(STATE)); }
+
+let STATE = loadState();
+if (!STATE.week)         STATE.week = "A";
+if (!STATE.celiaPts)    STATE.celiaPts = 0;
+if (!STATE.kataPts)     STATE.kataPts = 0;
+if (!STATE.celiaDone)   STATE.celiaDone = {};
+if (!STATE.kataDone)    STATE.kataDone = {};
+if (!STATE.celiaAvatar) STATE.celiaAvatar = "🌸";
+if (!STATE.kataAvatar)  STATE.kataAvatar = "🌻";
+if (!STATE.bg)          STATE.bg = "flower";
+if (!STATE.history)     STATE.history = [];
+if (!STATE.lastReset)   STATE.lastReset = null;
+// rewardSavings: { girl: { rewardId: depositedPts } }
+if (!STATE.celiaSavings)    STATE.celiaSavings    = {};
+if (!STATE.kataSavings)     STATE.kataSavings     = {};
+if (!STATE.celiaBonusTasks) STATE.celiaBonusTasks = [];
+if (!STATE.kataBonusTasks)  STATE.kataBonusTasks  = [];
+if (!STATE.calUrl)          STATE.calUrl          = "";
+if (!STATE.calEvents)       STATE.calEvents       = [];
+if (!STATE.calLastFetch)    STATE.calLastFetch     = null;
+if (!STATE.mamaDone)        STATE.mamaDone        = {};
+if (!STATE.mamaHistory)     STATE.mamaHistory     = [];
+if (!STATE.mamaResetWeek)   STATE.mamaResetWeek   = 1;
+if (!STATE.mamaIntention)   STATE.mamaIntention   = "";
+if (!STATE.mamaIntentionDate) STATE.mamaIntentionDate = "";
+
+
+checkDailyReset();
+
+let currentGirl = "celia";
+let currentView = "girl";
+let redeemPending = null;
+let depositPending = null;
+let depositSelected = 0;
+let avatarTarget = null;
+
+// ============================================================
+// DAILY RESET
+// ============================================================
+function checkDailyReset() {
+  const today = new Date().toDateString();
+  if (STATE.lastReset !== today) {
+    STATE.celiaDone = {};
+    STATE.kataDone  = {};
+    STATE.lastReset = today;
+    saveState();
+  }
+}
+function doReset() {
+  STATE.celiaDone = {};
+  STATE.kataDone  = {};
+  STATE.lastReset = new Date().toDateString();
+  saveState(); renderAll(); switchGirl(currentGirl);
+  document.getElementById("reset-modal").classList.remove("open");
+}
+function openResetModal() { document.getElementById("reset-modal").classList.add("open"); }
+function toggleWeek() {
+  STATE.week = STATE.week === "A" ? "B" : "A";
+  saveState(); renderAll(); switchGirl(currentGirl); updateSettingsView();
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getTasksForGirl(girl) {
+  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA).filter(t => !t.week || t.week === STATE.week);
+}
+function getRewardsForGirl(girl) {
+  const specific = girl === "celia" ? CELIA_REWARDS : KATA_REWARDS;
+  return [...specific, ...SHARED_REWARDS].sort((a,b) => a.pts - b.pts);
+}
+function getSavings(girl) {
+  return girl === "celia" ? STATE.celiaSavings : STATE.kataSavings;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderGirlView(girl) {
+  const el    = document.getElementById(girl + "-view");
+  const done  = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  const pts   = girl === "celia" ? STATE.celiaPts  : STATE.kataPts;
+  const name  = girl === "celia" ? "Celia" : "Kataleyah";
+  const avatar= girl === "celia" ? STATE.celiaAvatar : STATE.kataAvatar;
+  const tasks   = getTasksForGirl(girl);
+  const rewards = getRewardsForGirl(girl);
+  const savings = getSavings(girl);
+
+  const dailyChores = getTodayChores();
+  const bonusTasks  = getBonusTasks(girl);
+  const allTasks    = [...tasks, ...dailyChores, ...bonusTasks];
+  const totalTasks  = allTasks.length;
+  const doneTasks   = allTasks.filter(t => done[t.id]).length;
+
+  // Daily rotating chore banner
+  let taskHTML = buildDailyChoreHTML(girl);
+
+  // Bonus tasks
+  taskHTML += buildBonusHTML(girl);
+
+  // Standard tasks by category
+  taskHTML += "";
+  ["chores","academic","exercise","music"].forEach(cat => {
+    const catTasks = tasks.filter(t => t.cat === cat);
+    if (!catTasks.length) return;
+    const cc = CAT_COLORS[cat];
+    taskHTML += `<div class="cat-section">
+      <div class="cat-label"><span class="cat-dot" style="background:${cc.dot}"></span>${cc.label}</div>`;
+    catTasks.forEach(t => {
+      const isDone = !!done[t.id];
+      taskHTML += `<button class="task-btn ${cc.cls} ${isDone?"done":""}" onclick="toggleTask('${girl}','${t.id}',${t.pts},this)">
+        <span class="check-circle">${isDone?"✓":""}</span>
+        <span class="task-name">${t.name}</span>
+        <span class="task-pts-badge">+${t.pts} ⭐</span>
+      </button>`;
+    });
+    taskHTML += `</div>`;
+  });
+
+  // Rewards with deposit progress
+  let rewardsHTML = `<div class="rewards-section"><div class="rewards-label">🏆 Rewards</div>`;
+  rewards.forEach(r => {
+    const deposited = savings[r.id] || 0;
+    const pct = Math.min(100, Math.round(deposited / r.pts * 100));
+    const canRedeem = deposited >= r.pts;
+    const canDeposit = pts > 0 && deposited < r.pts;
+    rewardsHTML += `
+    <div class="reward-card ${canRedeem ? "can-redeem" : ""}">
+      <div class="reward-top">
+        <span class="reward-icon">${r.icon}</span>
+        <span class="reward-name">${r.name}</span>
+        <span class="reward-cost">${r.pts} ⭐</span>
+      </div>
+      <div class="reward-progress-wrap">
+        <div class="reward-progress-meta">
+          <span class="reward-deposited">${deposited} / ${r.pts} saved</span>
+          <span class="reward-pct">${pct}%</span>
+        </div>
+        <div class="reward-bar-bg">
+          <div class="reward-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="reward-actions">
+          ${canDeposit ? `<button class="deposit-btn" onclick="openDepositModal('${girl}','${r.id}','${r.name}','${r.icon}',${r.pts})">💰 Deposit points</button>` : ""}
+          ${canRedeem  ? `<button class="redeem-btn" onclick="openRedeemModal('${girl}','${r.id}','${r.name}',${r.pts},'${r.icon}')">🎉 Redeem!</button>` : ""}
+        </div>
+      </div>
+    </div>`;
+  });
+  rewardsHTML += `</div>`;
+
+  el.innerHTML = `
+    <div class="girl-header">
+      <div class="avatar-wrap">
+        <div class="avatar-circle" onclick="openAvatarModal('${girl}')">${avatar}</div>
+        <div class="avatar-edit-hint">✏️</div>
+      </div>
+      <div class="girl-title">
+        <div class="girl-name">${name}</div>
+        <div class="girl-points">⭐ ${pts} pts available · ${doneTasks}/${totalTasks} tasks</div>
+      </div>
+      <div class="week-badge">Week ${STATE.week}<br>${doneTasks===totalTasks?"🌟 Done!":""}</div>
+    </div>
+    ${taskHTML}
+    ${rewardsHTML}
+  `;
+}
+
+function renderAll() {
+  renderGirlView("celia");
+  renderGirlView("kata");
+  renderMamaView();
+  updateTabs();
+  updateDashboard();
+  updateSettingsView();
+}
+
+function updateTabs() {
+  document.getElementById("celia-tab-pts").textContent = STATE.celiaPts + " pts";
+  document.getElementById("kata-tab-pts").textContent  = STATE.kataPts  + " pts";
+}
+
+function switchGirl(girl) {
+  currentGirl = girl;
+  document.getElementById("celia-view").style.display = girl==="celia" ? "" : "none";
+  document.getElementById("kata-view").style.display  = girl==="kata"  ? "" : "none";
+  document.getElementById("mama-view").style.display  = girl==="mama"  ? "" : "none";
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.girl===girl));
+  document.getElementById("nav-celia").classList.toggle("active", girl==="celia" && currentView==="girl");
+  document.getElementById("nav-kata").classList.toggle("active",  girl==="kata"  && currentView==="girl");
+  document.getElementById("nav-mama").classList.toggle("active",  girl==="mama"  && currentView==="girl");
+  if (girl==="mama") renderMamaView();
+}
+
+function showView(view) {
+  currentView = view;
+  const mc   = document.getElementById("main-card");
+  const dv   = document.getElementById("dashboard-view");
+  const sv   = document.getElementById("settings-view");
+  const tabs = document.getElementById("tabs");
+  mc.style.display = dv.style.display = sv.style.display = tabs.style.display = "none";
+
+  if (view === "girl")      { mc.style.display = tabs.style.display = ""; }
+  else if (view === "dashboard") { dv.style.display = "block"; updateDashboard(); }
+  else if (view === "settings")  { sv.style.display = "block"; updateSettingsView(); }
+
+  ["nav-celia","nav-kata","nav-mama","nav-dash","nav-settings"].forEach(id =>
+    document.getElementById(id).classList.remove("active"));
+  if (view==="girl" && currentGirl==="celia") document.getElementById("nav-celia").classList.add("active");
+  if (view==="girl" && currentGirl==="kata")  document.getElementById("nav-kata").classList.add("active");
+  if (view==="girl" && currentGirl==="mama")  document.getElementById("nav-mama").classList.add("active");
+  if (view==="dashboard") document.getElementById("nav-dash").classList.add("active");
+  if (view==="settings")  document.getElementById("nav-settings").classList.add("active");
+}
+
+// ============================================================
+// TASK TOGGLE
+// ============================================================
+function toggleTask(girl, taskId, pts, btn) {
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  if (done[taskId]) {
+    done[taskId] = false;
+    if (girl === "celia") STATE.celiaPts = Math.max(0, STATE.celiaPts - pts);
+    else                  STATE.kataPts  = Math.max(0, STATE.kataPts  - pts);
+  } else {
+    done[taskId] = true;
+    if (girl === "celia") STATE.celiaPts += pts;
+    else                  STATE.kataPts  += pts;
+    const taskName = btn.querySelector(".task-name").textContent;
+    addHistory(girl==="celia"?"Celia":"Kata", taskName, pts);
+    celebrate(btn, pts);
+  }
+  saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+// ============================================================
+// DEPOSIT FLOW
+// ============================================================
+function openDepositModal(girl, rewardId, rewardName, icon, rewardCost) {
+  const pts = girl === "celia" ? STATE.celiaPts : STATE.kataPts;
+  const savings = getSavings(girl);
+  const alreadySaved = savings[rewardId] || 0;
+  const remaining = rewardCost - alreadySaved;
+  const maxDeposit = Math.min(pts, remaining);
+
+  depositPending = { girl, rewardId, rewardName, rewardCost };
+  depositSelected = 0;
+
+  document.getElementById("dep-icon").textContent  = icon;
+  document.getElementById("dep-title").textContent = rewardName;
+  document.getElementById("dep-avail").textContent = `You have ${pts} ⭐ available · ${remaining} more needed`;
+
+  // Build amount buttons
+  const amounts = [];
+  const steps = [5,10,25,50,100,250,500];
+  steps.forEach(s => { if (s <= maxDeposit) amounts.push(s); });
+  if (maxDeposit > 0 && !amounts.includes(maxDeposit)) amounts.push(maxDeposit);
+  if (amounts.length === 0) amounts.push(maxDeposit > 0 ? maxDeposit : 0);
+
+  const amtEl = document.getElementById("dep-amounts");
+  amtEl.innerHTML = amounts.map(a =>
+    `<button class="d-amt-btn" data-amt="${a}" onclick="selectDepositAmt(${a})" ${a>maxDeposit?"disabled":""}>${a} ⭐</button>`
+  ).join("") + `<button class="d-amt-btn" data-amt="${maxDeposit}" onclick="selectDepositAmt(${maxDeposit})" style="border-color:#22c55e">All (${maxDeposit}) ⭐</button>`;
+
+  document.getElementById("deposit-modal").classList.add("open");
+}
+
+function selectDepositAmt(amt) {
+  depositSelected = amt;
+  document.querySelectorAll(".d-amt-btn").forEach(b => {
+    b.classList.toggle("selected", parseInt(b.dataset.amt) === amt);
+  });
+}
+
+function closeDepositModal() {
+  depositPending = null; depositSelected = 0;
+  document.getElementById("deposit-modal").classList.remove("open");
+}
+
+function confirmDeposit() {
+  if (!depositPending || depositSelected <= 0) { closeDepositModal(); return; }
+  const { girl, rewardId, rewardName, rewardCost } = depositPending;
+  const savings = getSavings(girl);
+  savings[rewardId] = (savings[rewardId] || 0) + depositSelected;
+
+  if (girl === "celia") { STATE.celiaPts = Math.max(0, STATE.celiaPts - depositSelected); STATE.celiaSavings = savings; }
+  else                  { STATE.kataPts  = Math.max(0, STATE.kataPts  - depositSelected); STATE.kataSavings  = savings; }
+
+  addHistory(girl==="celia"?"Celia":"Kata", `💰 Saved ${depositSelected} toward ${rewardName}`, -depositSelected);
+  saveState(); closeDepositModal(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+  // Mini confetti
+  const el = document.getElementById(girl+"-view");
+  launchConfetti();
+}
+
+// ============================================================
+// REDEEM
+// ============================================================
+function openRedeemModal(girl, rewardId, name, pts, icon) {
+  redeemPending = { girl, rewardId, name, pts };
+  document.getElementById("redeem-icon").textContent  = icon;
+  document.getElementById("redeem-title").textContent = name;
+  document.getElementById("redeem-desc").textContent  = `Use your ${pts} saved ⭐ to redeem this reward?`;
+  document.getElementById("redeem-modal").classList.add("open");
+}
+function closeRedeemModal() {
+  redeemPending = null;
+  document.getElementById("redeem-modal").classList.remove("open");
+}
+function confirmRedeem() {
+  if (!redeemPending) return;
+  const { girl, rewardId, name, pts } = redeemPending;
+  const savings = getSavings(girl);
+  savings[rewardId] = 0; // clear savings for this reward
+  if (girl === "celia") STATE.celiaSavings = savings;
+  else                  STATE.kataSavings  = savings;
+  addHistory(girl==="celia"?"Celia":"Kata", "🏆 Redeemed: " + name, 0);
+  saveState(); closeRedeemModal(); renderAll(); switchGirl(currentGirl); launchConfetti();
+}
+
+// ============================================================
+// AVATAR
+// ============================================================
+function openAvatarModal(girl) {
+  avatarTarget = girl;
+  const current = girl==="celia" ? STATE.celiaAvatar : STATE.kataAvatar;
+  document.getElementById("emoji-grid").innerHTML = AVATARS.map(e =>
+    `<div class="emoji-opt ${e===current?"selected":""}" onclick="pickAvatar('${e}')">${e}</div>`
+  ).join("");
+  document.getElementById("avatar-modal").classList.add("open");
+}
+function pickAvatar(emoji) {
+  if (avatarTarget==="celia") STATE.celiaAvatar = emoji;
+  else                        STATE.kataAvatar  = emoji;
+  document.querySelectorAll(".emoji-opt").forEach(e => e.classList.toggle("selected", e.textContent===emoji));
+  saveState(); renderGirlView(avatarTarget); switchGirl(currentGirl);
+}
+function closeAvatarModal() {
+  document.getElementById("avatar-modal").classList.remove("open");
+  avatarTarget = null;
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function updateDashboard() {
+  const cT = getTasksForGirl("celia"), kT = getTasksForGirl("kata");
+  const cD = cT.filter(t => STATE.celiaDone[t.id]).length;
+  const kD = kT.filter(t => STATE.kataDone[t.id]).length;
+  const cP = cT.length ? Math.round(cD/cT.length*100) : 0;
+  const kP = kT.length ? Math.round(kD/kT.length*100) : 0;
+  document.getElementById("dash-cards").innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-name">${STATE.celiaAvatar} Celia</div>
+      <div class="dash-card-pts">${STATE.celiaPts}</div>
+      <div class="dash-card-label">pts available</div>
+      <div class="dash-progress"><div class="dash-progress-bar" style="width:${cP}%"></div></div>
+      <div class="dash-tasks-done">${cD}/${cT.length} tasks · ${cP}%</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-name">${STATE.kataAvatar} Kata</div>
+      <div class="dash-card-pts">${STATE.kataPts}</div>
+      <div class="dash-card-label">pts available</div>
+      <div class="dash-progress"><div class="dash-progress-bar" style="width:${kP}%"></div></div>
+      <div class="dash-tasks-done">${kD}/${kT.length} tasks · ${kP}%</div>
+    </div>`;
+
+  // Calendar events panel
+  const calPanel = document.getElementById("dash-cal-events");
+  if (calPanel) {
+    if (STATE.calEvents && STATE.calEvents.length) {
+      calPanel.innerHTML = STATE.calEvents.slice(0,8).map(e => {
+        const d = new Date(e.start);
+        const dateStr = d.toLocaleDateString([],{month:"short",day:"numeric"});
+        const timeStr = (d.getHours()===0&&d.getMinutes()===0)?"All day":d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+        return `<div class="cal-event"><span class="cal-event-dot"></span><span style="flex:1">${e.summary}</span><span class="cal-event-time">${dateStr} ${timeStr}</span></div>`;
+      }).join("");
+    } else {
+      calPanel.innerHTML = `<div style="color:rgba(255,255,255,0.4);font-size:0.82rem;padding:6px 0">No upcoming events · Add a calendar in Settings ⚙️</div>`;
+    }
+  }
+
+  const entries = STATE.history.slice(0,20);
+  document.getElementById("dash-history-list").innerHTML = entries.length
+    ? entries.map(e => `<div class="history-entry"><span class="history-who">${e.who}</span><span>${e.task}</span><span class="history-time">${e.time}</span></div>`).join("")
+    : `<div style="color:rgba(255,255,255,0.4);font-size:0.85rem;padding:8px 0">No activity yet 🌸</div>`;
+}
+
+// ============================================================
+// SETTINGS / BG
+// ============================================================
+function updateSettingsView() {
+  document.getElementById("week-display").textContent = "Current Week: " + STATE.week;
+  document.getElementById("s-celia-pts").textContent  = STATE.celiaPts;
+  document.getElementById("s-kata-pts").textContent   = STATE.kataPts;
+  document.getElementById("next-reset-display").textContent = "Tomorrow at midnight";
+  buildBgPicker();
+  const calInput = document.getElementById("cal-url-input");
+  if (calInput) calInput.value = STATE.calUrl || "";
+  const calStatus = document.getElementById("cal-status");
+  if (calStatus && STATE.calLastFetch) {
+    calStatus.textContent = `✅ Last fetched: ${new Date(STATE.calLastFetch).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})} · ${(STATE.calEvents||[]).length} event(s)`;
+  }
+}
+
+function buildBgPicker() {
+  document.getElementById("bg-picker").innerHTML = BG_OPTIONS.map(bg => {
+    return `<div class="bg-swatch ${STATE.bg===bg.id?"selected":""}" style="background:${bg.previewGrad}" onclick="setBg('${bg.id}')">
+      <span class="bg-swatch-label">${bg.label}</span>
+    </div>`;
+  }).join("");
+}
+
+function setBg(id) {
+  STATE.bg = id; saveState(); applyBg(); buildBgPicker();
+}
+
+function applyBg() {
+  const bg = BG_OPTIONS.find(b => b.id === STATE.bg) || BG_OPTIONS[0];
+  const el = document.getElementById("bg");
+  el.style.background = "";
+  el.style.backgroundImage = BG_SVG[bg.svgKey] || BG_SVG.flower;
+  el.style.backgroundSize = "cover";
+  el.style.backgroundPosition = "center";
+}
+
+function adjustPts(girl, amount) {
+  if (girl==="celia") STATE.celiaPts = Math.max(0, STATE.celiaPts + amount);
+  else                STATE.kataPts  = Math.max(0, STATE.kataPts  + amount);
+  saveState(); updateSettingsView(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+function addHistory(who, task, pts) {
+  const time = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  STATE.history.unshift({ who, task, pts, time, date: new Date().toDateString() });
+  if (STATE.history.length > 100) STATE.history.pop();
+  saveState();
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+const canvas = document.getElementById("confetti-canvas");
+const ctx = canvas.getContext("2d");
+let pieces = [], animF = null;
+function launchConfetti() {
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const cols = ["#ff6b9d","#f59e0b","#22c55e","#3b82f6","#a855f7","#ffe066","#ff9ff3"];
+  for (let i=0;i<60;i++) pieces.push({
+    x:Math.random()*canvas.width, y:canvas.height*0.5+Math.random()*150,
+    r:5+Math.random()*7, color:cols[Math.floor(Math.random()*cols.length)],
+    vx:(Math.random()-0.5)*8, vy:-(Math.random()*10+4),
+    alpha:1, rot:Math.random()*360, rv:(Math.random()-0.5)*8,
+  });
+  if (!animF) animLoop();
+}
+function animLoop() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  pieces.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.35; p.rot+=p.rv; p.alpha-=0.018;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.globalAlpha=Math.max(0,p.alpha); ctx.fillStyle=p.color;
+    ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.5); ctx.restore();
+  });
+  pieces = pieces.filter(p=>p.alpha>0);
+  if (pieces.length) { animF = requestAnimationFrame(animLoop); }
+  else { animF=null; ctx.clearRect(0,0,canvas.width,canvas.height); }
+}
+
+function celebrate(btn, pts) {
+  const rect = btn.getBoundingClientRect();
+  const pop = document.createElement("div");
+  pop.className = "celebration-pop";
+  pop.textContent = "+" + pts + " ⭐";
+  pop.style.left = (rect.left + rect.width/2 - 30) + "px";
+  pop.style.top  = rect.top + "px";
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(), 1300);
+  launchConfetti();
+}
+
+// ============================================================
+// DAILY ROTATING CHORES
+// ============================================================
+// 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+const DAILY_CHORES = {
+  1: [ // Monday
+    { id:"daily_mon_laundry", name:"Laundry (wash, fold, put away) 🧺", pts:3, cat:"chores" }
+  ],
+  2: [ // Tuesday
+    { id:"daily_tue_chickens", name:"Chickens (food & water) 🐔", pts:3, cat:"chores" }
+  ],
+  3: [ // Wednesday
+    { id:"daily_wed_bath",    name:"Bathrooms 🚿",           pts:2, cat:"chores" },
+    { id:"daily_wed_upstairs",name:"Upstairs common area 🛋️", pts:2, cat:"chores" }
+  ],
+  4: [ // Thursday
+    { id:"daily_thu_cats",    name:"Cat boxes 🐱",            pts:2, cat:"chores" }
+  ],
+  5: [ // Friday
+    { id:"daily_fri_game",    name:"Game together 🎲",         pts:3, cat:"chores" }
+  ],
+};
+
+const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+function getTodayChores() {
+  const day = new Date().getDay();
+  return DAILY_CHORES[day] || [];
+}
+
+function getDayLabel() {
+  const day = new Date().getDay();
+  if (day === 0 || day === 6) return null; // weekend
+  return DAY_NAMES[day];
+}
+
+function buildDailyChoreHTML(girl) {
+  const chores = getTodayChores();
+  const dayLabel = getDayLabel();
+  if (!chores.length) {
+    const isWeekend = [0,6].includes(new Date().getDay());
+    if (isWeekend) {
+      return `<div class="daily-chore-section">
+        <div class="daily-chore-banner">
+          <div class="daily-chore-header">
+            <span class="daily-chore-day">Weekend 🌟</span>
+            <span class="daily-chore-title">No special chore today — enjoy your day!</span>
+          </div>
+        </div>
+      </div>`;
+    }
+    return '';
+  }
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  let choreButtons = chores.map(t => {
+    const isDone = !!done[t.id];
+    return `<button class="task-btn chores ${isDone?"done":""}" onclick="toggleTask('${girl}','${t.id}',${t.pts},this)">
+      <span class="check-circle">${isDone?"✓":""}</span>
+      <span class="task-name">${t.name}</span>
+      <span class="task-pts-badge">+${t.pts} ⭐</span>
+    </button>`;
+  }).join('');
+  return `<div class="daily-chore-section">
+    <div class="daily-chore-banner">
+      <div class="daily-chore-header">
+        <span class="daily-chore-day">📅 ${dayLabel}</span>
+        <span class="daily-chore-title">Today's Special Chore${chores.length>1?"s":""}</span>
+      </div>
+      ${choreButtons}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// BONUS TASKS
+// ============================================================
+function getBonusTasks(girl) {
+  return girl === "celia" ? (STATE.celiaBonusTasks || []) : (STATE.kataBonusTasks || []);
+}
+
+function buildBonusHTML(girl) {
+  const bonus = getBonusTasks(girl);
+  const done  = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  let listHTML = bonus.map((t,i) => {
+    const isDone = !!done[t.id];
+    return `<div class="bonus-task-btn ${isDone?"done":""}" onclick="toggleBonus('${girl}',${i},this)">
+      <span class="check-circle" style="border-color:rgba(236,72,153,0.5);${isDone?"background:rgba(34,197,94,0.7);border-color:#22c55e":""}">
+        ${isDone?"✓":""}
+      </span>
+      <span class="task-name">${t.name}</span>
+      <span class="task-pts-badge" style="background:rgba(236,72,153,0.25)">+${t.pts} ⭐</span>
+      ${!isDone ? `<button class="bonus-delete" onclick="deleteBonus(event,'${girl}',${i})">✕</button>` : ""}
+    </div>`;
+  }).join('');
+
+  return `<div class="bonus-section">
+    <div class="bonus-label"><span class="bonus-dot"></span>✨ Bonus Tasks</div>
+    <div class="bonus-input-row">
+      <input class="bonus-task-input" id="bonus-name-${girl}" type="text"
+        placeholder="Add your own task…" maxlength="60">
+      <input class="bonus-pts-input" id="bonus-pts-${girl}" type="number"
+        placeholder="pts" min="1" max="50" value="2">
+      <button class="bonus-add-btn" onclick="addBonusTask('${girl}')">+ Add</button>
+    </div>
+    ${listHTML}
+  </div>`;
+}
+
+function addBonusTask(girl) {
+  const nameEl = document.getElementById("bonus-name-" + girl);
+  const ptsEl  = document.getElementById("bonus-pts-"  + girl);
+  const name = nameEl.value.trim();
+  const pts  = Math.max(1, Math.min(50, parseInt(ptsEl.value) || 2));
+  if (!name) { nameEl.focus(); return; }
+  const id = "bonus_" + girl + "_" + Date.now();
+  const task = { id, name, pts };
+  if (girl === "celia") {
+    STATE.celiaBonusTasks = STATE.celiaBonusTasks || [];
+    STATE.celiaBonusTasks.push(task);
+  } else {
+    STATE.kataBonusTasks = STATE.kataBonusTasks || [];
+    STATE.kataBonusTasks.push(task);
+  }
+  nameEl.value = ""; ptsEl.value = "2";
+  saveState(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+function deleteBonus(e, girl, idx) {
+  e.stopPropagation();
+  if (girl === "celia") STATE.celiaBonusTasks.splice(idx, 1);
+  else                  STATE.kataBonusTasks.splice(idx, 1);
+  saveState(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+function toggleBonus(girl, idx, el) {
+  const tasks = getBonusTasks(girl);
+  const t = tasks[idx];
+  if (!t) return;
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  if (done[t.id]) {
+    done[t.id] = false;
+    if (girl==="celia") STATE.celiaPts = Math.max(0, STATE.celiaPts - t.pts);
+    else                STATE.kataPts  = Math.max(0, STATE.kataPts  - t.pts);
+  } else {
+    done[t.id] = true;
+    if (girl==="celia") STATE.celiaPts += t.pts;
+    else                STATE.kataPts  += t.pts;
+    addHistory(girl==="celia"?"Celia":"Kata", "✨ Bonus: " + t.name, t.pts);
+    celebrate(el, t.pts);
+  }
+  saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+// ============================================================
+// GOOGLE CALENDAR (iCal fetch)
+// ============================================================
+
+const CAL_PROXY = "https://api.allorigins.win/raw?url=";
+const CAL_REFRESH_MS = 15 * 60 * 1000; // 15 min auto-refresh
+
+function saveCalUrl() {
+  const url = (document.getElementById("cal-url-input") || {}).value?.trim();
+  if (url) { STATE.calUrl = url; saveState(); }
+  fetchCalendar();
+}
+
+async function fetchCalendar() {
+  if (!STATE.calUrl) {
+    setCalStatus("⚠️ No calendar URL saved yet.");
+    return;
+  }
+  setCalStatus("⏳ Fetching calendar…");
+  try {
+    const proxyUrl = CAL_PROXY + encodeURIComponent(STATE.calUrl);
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const events = parseIcal(text);
+    STATE.calEvents = events;
+    STATE.calLastFetch = Date.now();
+    saveState();
+    setCalStatus(`✅ ${events.length} event(s) loaded · ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`);
+  } catch(err) {
+    setCalStatus("❌ Could not fetch. Check URL or try again. " + err.message);
+  }
+}
+
+function parseIcal(text) {
+  const events = [];
+  const blocks = text.split("BEGIN:VEVENT");
+  const now = new Date();
+  const cutoff = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  blocks.slice(1).forEach(block => {
+    const get = key => {
+      const m = block.match(new RegExp(key + "[^:]*:([\\s\\S]+?)\r?\n(?! )"));
+      return m ? m[1].replace(/\\n/g,"\n").replace(/\\,/g,",").trim() : "";
+    };
+    const summary = get("SUMMARY");
+    const dtstart = get("DTSTART");
+    const dtend   = get("DTEND");
+    if (!summary || !dtstart) return;
+    const start = parseIcalDate(dtstart);
+    if (!start || start < now || start > cutoff) return;
+    events.push({ summary, start, dtend: parseIcalDate(dtend) });
+  });
+  events.sort((a,b) => a.start - b.start);
+  return events.slice(0, 20);
+}
+
+function parseIcalDate(str) {
+  if (!str) return null;
+  str = str.replace(/[TZ]/g, " ").trim().replace(/\s+/," ");
+  const y=str.slice(0,4), mo=str.slice(4,6), d=str.slice(6,8);
+  const h=str.slice(9,11)||"00", mi=str.slice(11,13)||"00";
+  const dt = new Date(`${y}-${mo}-${d}T${h}:${mi}:00`);
+  return isNaN(dt) ? null : dt;
+}
+
+function setCalStatus(msg) {
+  const el = document.getElementById("cal-status");
+  if (el) el.textContent = msg;
+}
+
+function buildCalEventsHTML() {
+  if (!STATE.calEvents || !STATE.calEvents.length) return "";
+  return `<div class="cal-events">` +
+    STATE.calEvents.map(e => {
+      const d = new Date(e.start);
+      const dateStr = d.toLocaleDateString([],{month:"short",day:"numeric"});
+      const timeStr = d.getHours()===0 && d.getMinutes()===0
+        ? "All day"
+        : d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+      return `<div class="cal-event">
+        <span class="cal-event-dot"></span>
+        <span style="flex:1">${e.summary}</span>
+        <span class="cal-event-time">${dateStr} ${timeStr}</span>
+      </div>`;
+    }).join("") + `</div>`;
+}
+
+// Auto-refresh calendar every 15 min
+setInterval(() => {
+  if (STATE.calUrl && (!STATE.calLastFetch || Date.now() - STATE.calLastFetch > CAL_REFRESH_MS)) {
+    fetchCalendar();
+  }
+}, 60 * 1000);
+
+// ============================================================
+
+// ============================================================
+// INIT
+// ============================================================
+applyBg();
+renderAll();
+switchGirl("celia");
+showView("girl");
+// Fetch calendar on load if URL is saved
+if (STATE.calUrl) fetchCalendar();
+
+// Modal backdrop close
+["avatar-modal","deposit-modal","redeem-modal","reset-modal"].forEach(id => {
+  document.getElementById(id).addEventListener("click", function(e) {
+    if (e.target === this) {
+      if (id==="avatar-modal") closeAvatarModal();
+      else if (id==="deposit-modal") closeDepositModal();
+      else if (id==="redeem-modal") closeRedeemModal();
+      else this.classList.remove("open");
+    }
+  });
+});
+window.addEventListener("resize",()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+
+// ── SERVICE WORKER REGISTRATION ──────────────────────────────
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(reg => console.log("HomeStar SW registered:", reg.scope))
+      .catch(err => console.log("SW registration failed:", err));
+  });
+}
+</script>
+</body>
+</html>
