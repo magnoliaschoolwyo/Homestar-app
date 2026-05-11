@@ -970,27 +970,44 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 
     <div class="settings-section">
       <div class="settings-title">📊 Points (Parent Adjust)</div>
-      <div class="settings-row">
-        <span class="settings-label">Celia total</span>
-        <span class="settings-label" id="s-celia-pts" style="color:#ffe066">0</span>
+
+      <!-- Girl selector -->
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="settings-btn" id="adj-btn-celia"
+          onclick="selectAdjustGirl('celia')"
+          style="flex:1;background:rgba(249,168,212,0.3);border:2px solid rgba(249,168,212,0.5)">
+          🌸 Celia
+        </button>
+        <button class="settings-btn" id="adj-btn-kata"
+          onclick="selectAdjustGirl('kata')"
+          style="flex:1">
+          🌻 Kata
+        </button>
       </div>
-      <div class="settings-row">
-        <span class="settings-label">Kata total</span>
-        <span class="settings-label" id="s-kata-pts" style="color:#ffe066">0</span>
+
+      <!-- Selected girl display -->
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:rgba(255,255,255,0.7)" id="adj-girl-label">Celia</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:2.8rem;color:#ffe066;line-height:1" id="adj-pts-display">0</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);font-weight:700">points</div>
       </div>
-      <div class="settings-row">
-        <span class="settings-label">Adjust Celia</span>
-        <div style="display:flex;gap:6px">
-          <button class="settings-btn" onclick="adjustPts('celia',-10)">−10</button>
-          <button class="settings-btn" onclick="adjustPts('celia',10)">+10</button>
-        </div>
+
+      <!-- +/- controls -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+        <button class="settings-btn" onclick="adjustPts(adjGirl,-1)"  style="font-size:1.1rem">−1</button>
+        <button class="settings-btn" onclick="adjustPts(adjGirl,-5)"  style="font-size:1rem">−5</button>
+        <button class="settings-btn" onclick="adjustPts(adjGirl,5)"   style="font-size:1rem">+5</button>
+        <button class="settings-btn" onclick="adjustPts(adjGirl,1)"   style="font-size:1.1rem">+1</button>
       </div>
-      <div class="settings-row">
-        <span class="settings-label">Adjust Kata</span>
-        <div style="display:flex;gap:6px">
-          <button class="settings-btn" onclick="adjustPts('kata',-10)">−10</button>
-          <button class="settings-btn" onclick="adjustPts('kata',10)">+10</button>
-        </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+        <button class="settings-btn" onclick="adjustPts(adjGirl,-10)" style="font-size:0.9rem">−10</button>
+        <button class="settings-btn" onclick="adjustPts(adjGirl,10)"  style="font-size:0.9rem">+10</button>
+      </div>
+
+      <!-- Both totals at a glance -->
+      <div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12)">
+        <span style="font-size:0.82rem;font-weight:800;color:rgba(255,255,255,0.6)">🌸 Celia: <span id="s-celia-pts" style="color:#ffe066">0</span> pts</span>
+        <span style="font-size:0.82rem;font-weight:800;color:rgba(255,255,255,0.6)">🌻 Kata: <span id="s-kata-pts" style="color:#ffe066">0</span> pts</span>
       </div>
     </div>
   </div>
@@ -1471,6 +1488,7 @@ const _origCheckDailyReset = checkDailyReset;
 function checkDailyReset() {
   const today = new Date().toDateString();
   if (STATE.lastReset !== today) {
+    // ⚠️ ONLY clear task completion — NEVER touch points
     STATE.celiaDone = {};
     STATE.kataDone  = {};
     // Save mama done to history before clearing
@@ -1507,6 +1525,12 @@ let STATE = loadState();
 if (!STATE.week)         STATE.week = "A";
 if (!STATE.celiaPts)    STATE.celiaPts = 0;
 if (!STATE.kataPts)     STATE.kataPts = 0;
+// Restore points lost in cache reset — one-time credit
+if (!STATE.pointsRestored_v1) {
+  STATE.celiaPts += 30;
+  STATE.kataPts  += 50;
+  STATE.pointsRestored_v1 = true;
+}
 if (!STATE.celiaDone)   STATE.celiaDone = {};
 if (!STATE.kataDone)    STATE.kataDone = {};
 if (!STATE.celiaAvatar) STATE.celiaAvatar = "🌸";
@@ -1923,8 +1947,11 @@ function updateDashboard() {
 // ============================================================
 function updateSettingsView() {
   document.getElementById("week-display").textContent = "Current Week: " + STATE.week;
-  document.getElementById("s-celia-pts").textContent  = STATE.celiaPts;
-  document.getElementById("s-kata-pts").textContent   = STATE.kataPts;
+  // Update both totals at a glance row
+  const sCelia = document.getElementById("s-celia-pts");
+  const sKata  = document.getElementById("s-kata-pts");
+  if (sCelia) sCelia.textContent = STATE.celiaPts;
+  if (sKata)  sKata.textContent  = STATE.kataPts;
   document.getElementById("next-reset-display").textContent = "Tomorrow at midnight";
   buildBgPicker();
   const calInput = document.getElementById("cal-url-input");
@@ -1933,6 +1960,9 @@ function updateSettingsView() {
   if (calStatus && STATE.calLastFetch) {
     calStatus.textContent = `✅ Last fetched: ${new Date(STATE.calLastFetch).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})} · ${(STATE.calEvents||[]).length} event(s)`;
   }
+  // Refresh the adjust panel display
+  const disp = document.getElementById("adj-pts-display");
+  if (disp) disp.textContent = adjGirl === "celia" ? STATE.celiaPts : STATE.kataPts;
 }
 
 function buildBgPicker() {
@@ -1956,10 +1986,41 @@ function applyBg() {
   el.style.backgroundPosition = "center";
 }
 
+let adjGirl = "celia"; // tracks which girl is selected in parent adjust
+
+function selectAdjustGirl(girl) {
+  adjGirl = girl;
+  // Update button highlights
+  const cBtn = document.getElementById("adj-btn-celia");
+  const kBtn = document.getElementById("adj-btn-kata");
+  if (cBtn && kBtn) {
+    if (girl === "celia") {
+      cBtn.style.background = "rgba(249,168,212,0.3)";
+      cBtn.style.borderColor = "rgba(249,168,212,0.5)";
+      kBtn.style.background = "rgba(255,255,255,0.22)";
+      kBtn.style.borderColor = "transparent";
+    } else {
+      kBtn.style.background = "rgba(192,132,252,0.3)";
+      kBtn.style.borderColor = "rgba(192,132,252,0.5)";
+      cBtn.style.background = "rgba(255,255,255,0.22)";
+      cBtn.style.borderColor = "transparent";
+    }
+  }
+  // Update display
+  const label = document.getElementById("adj-girl-label");
+  const disp  = document.getElementById("adj-pts-display");
+  if (label) label.textContent = girl === "celia" ? "Celia" : "Kataleyah";
+  if (disp)  disp.textContent  = girl === "celia" ? STATE.celiaPts : STATE.kataPts;
+}
+
 function adjustPts(girl, amount) {
-  if (girl==="celia") STATE.celiaPts = Math.max(0, STATE.celiaPts + amount);
-  else                STATE.kataPts  = Math.max(0, STATE.kataPts  + amount);
-  saveState(); updateSettingsView(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+  if (girl === "celia") STATE.celiaPts = Math.max(0, STATE.celiaPts + amount);
+  else                  STATE.kataPts  = Math.max(0, STATE.kataPts  + amount);
+  saveState();
+  updateSettingsView();
+  updateTabs();
+  renderGirlView(girl);
+  if (currentView === "girl") switchGirl(currentGirl);
 }
 
 function addHistory(who, task, pts) {
@@ -2504,9 +2565,16 @@ window.addEventListener("resize",()=>{canvas.width=window.innerWidth;canvas.heig
 // Only register SW on real deployed domain, not preview/dev environments
 if ("serviceWorker" in navigator && location.hostname !== "www.claudeusercontent.com") {
   window.addEventListener("load", () => {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      // Unregister all old service workers so fresh content loads immediately
+      regs.forEach(reg => reg.unregister());
+    });
     navigator.serviceWorker.register("/sw.js")
-      .then(reg => console.log("HomeStar SW registered:", reg.scope))
-      .catch(err => console.log("SW not found — upload sw.js to Netlify to enable offline mode."));
+      .then(reg => {
+        reg.update(); // force check for new version
+        console.log("HomeStar SW registered:", reg.scope);
+      })
+      .catch(err => console.log("SW not found — upload sw.js to enable offline mode."));
   });
 }
 </script>
