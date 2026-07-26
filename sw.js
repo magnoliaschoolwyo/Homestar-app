@@ -1,8 +1,10 @@
-const CACHE_NAME = 'homestar-v1';
+const CACHE_NAME = 'homestar-v8';
 const ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/celia.jpg',
+  '/kata.jpg'
 ];
 
 // Install: cache all core assets
