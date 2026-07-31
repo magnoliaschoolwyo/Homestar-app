@@ -118,31 +118,14 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 }
 .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-/* TASK BUTTON */
-.task-btn {
-  width: 100%; display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px; margin-bottom: 8px;
-  border: 2px solid rgba(255,255,255,0.28); border-radius: 16px;
-  background: rgba(255,255,255,0.14);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  cursor: pointer; transition: all 0.18s;
-  color: #fff; text-align: left;
-  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
-  position: relative; overflow: hidden;
-}
-.task-btn.chores   { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.15); }
-.task-btn.academic { border-color: rgba(59,130,246,0.45);  background: rgba(59,130,246,0.15); }
-.task-btn.exercise { border-color: rgba(34,197,94,0.45);   background: rgba(34,197,94,0.15); }
-.task-btn.music    { border-color: rgba(168,85,247,0.45);  background: rgba(168,85,247,0.15); }
-.task-btn.done { opacity: 0.55; background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.15) !important; text-decoration: line-through; }
-.task-btn:active { transform: scale(0.97); }
+/* Shared row primitives (used by classes/events, kid-added items, and
+   expanded assignment sub-tasks) */
 .check-circle {
   width: 28px; height: 28px; border-radius: 50%;
   border: 2.5px solid rgba(255,255,255,0.5);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; font-size: 1rem; transition: all 0.2s;
 }
-.task-btn.done .check-circle { background: rgba(34,197,94,0.7); border-color: #22c55e; }
 .task-name { flex: 1; }
 .task-pts-badge {
   padding: 3px 9px; border-radius: 20px;
@@ -353,12 +336,12 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 .d-cancel { background: rgba(255,255,255,0.15); color: #fff; }
 
 /* REDEEM / RESET / UNCHECK MODALS */
-#redeem-modal, #reset-modal, #uncheck-modal {
+#redeem-modal, #reset-modal, #uncheck-modal, #pin-modal, #class-modal {
   display: none; position: fixed; inset: 0; z-index: 9999;
   background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   align-items: center; justify-content: center;
 }
-#redeem-modal.open, #reset-modal.open, #uncheck-modal.open { display: flex; }
+#redeem-modal.open, #reset-modal.open, #uncheck-modal.open, #pin-modal.open, #class-modal.open { display: flex; }
 .redeem-card {
   background: rgba(40,0,80,0.92); border: 2px solid rgba(255,215,0,0.4);
   border-radius: 24px; padding: 28px 24px; width: 300px; max-width: 90vw; text-align: center;
@@ -372,6 +355,73 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 }
 .redeem-confirm { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
 .redeem-cancel  { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* PIN modal + unlock banner */
+.pin-input {
+  width: 100%; padding: 14px; margin-bottom: 10px;
+  border-radius: 14px; border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-family: "Nunito", sans-serif; font-size: 1.6rem; font-weight: 800;
+  text-align: center; letter-spacing: 0.3em; outline: none;
+}
+.pin-input:focus { border-color: rgba(255,215,0,0.6); }
+.pin-error { color: #f87171; font-size: 0.85rem; font-weight: 800; margin: -4px 0 14px; }
+#pin-modal .redeem-card.shake, #pin-modal.shake .redeem-card { animation: pin-shake 0.4s; }
+@keyframes pin-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+#unlock-banner {
+  display: none; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 8px 14px 0; padding: 10px 14px;
+  background: rgba(34,197,94,0.22); border: 2px solid rgba(34,197,94,0.5);
+  border-radius: 14px; color: #fff; font-weight: 800; font-size: 0.85rem;
+  flex-shrink: 0;
+}
+#unlock-banner button {
+  padding: 6px 12px; border-radius: 10px; border: none;
+  background: rgba(255,255,255,0.2); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.78rem;
+  cursor: pointer;
+}
+
+/* Class/event add-edit modal */
+.class-modal-card { width: 340px; max-height: 85vh; overflow-y: auto; }
+.class-modal-field { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+.class-modal-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.class-field-label {
+  display: block; font-size: 0.7rem; font-weight: 800;
+  color: rgba(255,255,255,0.55); margin-bottom: 4px;
+}
+.class-dow-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.class-dow-btn {
+  flex: 1; padding: 8px 0; border-radius: 10px; border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.75rem;
+  cursor: pointer;
+}
+.class-dow-btn.selected { border-color: #f59e0b; background: rgba(245,158,11,0.35); }
+#class-kind-recurring.selected, #class-kind-oneoff.selected {
+  background: rgba(245,158,11,0.35); border: 2px solid rgba(245,158,11,0.6);
+}
+.class-list-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; margin-bottom: 8px;
+  border-radius: 14px; background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.class-list-info { flex: 1; min-width: 0; }
+.class-list-name { font-weight: 800; font-size: 0.88rem; color: #fff; }
+.class-list-meta { font-size: 0.72rem; color: rgba(255,255,255,0.55); font-weight: 700; margin-top: 2px; }
+.class-list-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.class-list-actions button {
+  padding: 5px 10px; border-radius: 10px; border: none;
+  font-size: 0.72rem; font-weight: 800; cursor: pointer;
+  background: rgba(255,255,255,0.16); color: #fff;
+}
+.class-list-actions button.danger { background: rgba(239,68,68,0.35); }
 
 /* BOTTOM NAV */
 #bottom-nav {
@@ -424,17 +474,7 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   font-size: 1rem; color: #fff;
 }
 
-/* ===== BONUS TASK ===== */
-.bonus-section { margin-bottom: 18px; }
-.bonus-label {
-  font-family: "Fredoka One", cursive; font-size: 1rem;
-  color: rgba(255,255,255,0.95); margin-bottom: 8px;
-  display: flex; align-items: center; gap: 7px;
-}
-.bonus-dot { width: 10px; height: 10px; border-radius: 50%; background: #ec4899; flex-shrink: 0; }
-.bonus-input-row {
-  display: flex; gap: 8px; margin-bottom: 8px; align-items: stretch;
-}
+/* ===== ADDED-ITEM FORM CONTROLS (shared with the removed Bonus Task form) ===== */
 .bonus-task-input {
   flex: 1; padding: 11px 14px;
   border-radius: 14px; border: 2px solid rgba(236,72,153,0.35);
@@ -446,16 +486,6 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 }
 .bonus-task-input::placeholder { color: rgba(255,255,255,0.4); font-weight: 600; }
 .bonus-task-input:focus { border-color: rgba(236,72,153,0.7); }
-.bonus-pts-input {
-  width: 64px; padding: 11px 10px;
-  border-radius: 14px; border: 2px solid rgba(236,72,153,0.35);
-  background: rgba(236,72,153,0.12);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  color: #fff; font-family: "Nunito", sans-serif;
-  font-size: 0.95rem; font-weight: 800; text-align: center;
-  outline: none;
-}
-.bonus-pts-input:focus { border-color: rgba(236,72,153,0.7); }
 .bonus-add-btn {
   padding: 11px 16px; border-radius: 14px; border: none;
   background: linear-gradient(135deg, #ec4899, #a855f7);
@@ -464,22 +494,6 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   transition: opacity 0.15s;
 }
 .bonus-add-btn:active { opacity: 0.75; }
-.bonus-task-btn {
-  width: 100%; display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px; margin-bottom: 8px;
-  border: 2px solid rgba(236,72,153,0.35); border-radius: 16px;
-  background: rgba(236,72,153,0.13);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  cursor: pointer; transition: all 0.18s;
-  color: #fff; text-align: left;
-  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
-  position: relative;
-}
-.bonus-task-btn.done {
-  opacity: 0.55; background: rgba(255,255,255,0.08) !important;
-  border-color: rgba(255,255,255,0.15) !important; text-decoration: line-through;
-}
-.bonus-task-btn:active { transform: scale(0.97); }
 .bonus-delete {
   background: none; border: none; color: rgba(255,255,255,0.4);
   font-size: 1rem; cursor: pointer; padding: 2px 6px;
@@ -870,13 +884,11 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 .cal-today-btn:active { background: rgba(255,255,255,0.3); }
 .cal-legend {
   display: flex; gap: 14px; justify-content: center;
-  margin-bottom: 10px; font-size: 0.72rem; font-weight: 700;
+  margin-top: 14px; font-size: 0.72rem; font-weight: 700;
   color: rgba(255,255,255,0.7);
 }
 .cal-legend-item { display: flex; align-items: center; gap: 5px; }
 .cal-legend-swatch { width: 12px; height: 12px; border-radius: 4px; }
-.cal-legend-swatch.wk-a { background: rgba(255,159,205,0.55); }
-.cal-legend-swatch.wk-b { background: rgba(94,224,208,0.55); }
 .cal-dow-row {
   display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
   margin-bottom: 4px;
@@ -941,16 +953,21 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   font-weight: 700; font-size: 0.9rem;
 }
 .day-event-time { font-size: 0.78rem; font-weight: 800; color: rgba(255,215,0,0.85); white-space: nowrap; }
-.cal-class-dot {
+.day-event-row.done { opacity: 0.55; text-decoration: line-through; }
+.day-event-row .check-circle { width: 26px; height: 26px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+.day-event-row.done .check-circle { background: rgba(34,197,94,0.7); text-decoration: none; }
+.cal-class-dots {
   position: absolute; top: 3px; left: 4px;
-  width: 5px; height: 5px; border-radius: 50%; background: #ffe066;
+  display: flex; gap: 2px;
 }
+.cal-class-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+}
+.cal-legend-categories { flex-wrap: wrap; row-gap: 4px; }
 .day-detail-empty {
   font-size: 0.8rem; color: rgba(255,255,255,0.45); font-weight: 600;
   padding: 6px 2px;
 }
-.task-btn.locked { opacity: 0.6; cursor: not-allowed; }
-.bonus-task-btn.locked { cursor: not-allowed; }
 
 /* Kid-added tasks/events — visually distinct from graded categories, zero points */
 .kid-item-section { margin-bottom: 18px; }
@@ -973,6 +990,73 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   font-family: "Nunito", sans-serif; font-weight: 700; font-size: 0.85rem;
 }
 
+/* ============================================================
+   TASK CARD GRID (Phase 4) — landscape-oriented, replaces the flat
+   checklist. Cards wrap left-to-right, top-to-bottom.
+   ============================================================ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.task-card {
+  border: 2px solid rgba(255,255,255,0.28); border-radius: 16px;
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  padding: 12px 14px; min-height: 92px;
+  display: flex; flex-direction: column;
+  cursor: pointer; color: #fff; text-align: left;
+  font-family: "Nunito", sans-serif; font-size: 1rem; font-weight: 700;
+  transition: transform 0.15s;
+}
+.task-card:active { transform: scale(0.96); }
+.task-card.chores   { border-color: rgba(245,158,11,0.45); background: rgba(245,158,11,0.15); }
+.task-card.academic { border-color: rgba(59,130,246,0.45);  background: rgba(59,130,246,0.15); }
+.task-card.exercise { border-color: rgba(34,197,94,0.45);   background: rgba(34,197,94,0.15); }
+.task-card.music    { border-color: rgba(168,85,247,0.45);  background: rgba(168,85,247,0.15); }
+.task-card.bonus     { border-color: rgba(236,72,153,0.45); background: rgba(236,72,153,0.15); }
+.task-card.locked { opacity: 0.6; cursor: not-allowed; }
+.task-card-name { flex: 1; line-height: 1.3; }
+.task-card-pts { font-size: 0.85rem; font-weight: 800; opacity: 0.9; margin-top: 8px; }
+.task-card.done { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.12); }
+.task-card-star-fill { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; }
+
+/* Subject card (e.g. Book Study) — expands in place, spans full width when open */
+.subject-card { cursor: default; }
+.subject-card-header { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.subject-card-progress { font-size: 0.78rem; font-weight: 800; opacity: 0.85; white-space: nowrap; }
+.subject-card-chevron { font-size: 1.1rem; transition: transform 0.2s; opacity: 0.8; }
+.subject-card.expanded { grid-column: 1 / -1; }
+.subject-card.expanded .subject-card-chevron { transform: rotate(90deg); }
+.subject-subtask-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.subject-subtask-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.subject-subtask-row.done { opacity: 0.55; text-decoration: line-through; }
+.subject-subtask-row .check-circle {
+  border: none; background: rgba(255,255,255,0.15);
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 0.9rem; cursor: pointer;
+}
+.subject-subtask-row.done .check-circle { background: rgba(34,197,94,0.7); }
+.subject-subtask-row .task-name { flex: 1; font-weight: 700; font-size: 0.9rem; }
+.subject-subtask-link {
+  padding: 5px 10px; border-radius: 10px;
+  background: rgba(255,255,255,0.16); color: #fff;
+  font-size: 0.75rem; font-weight: 800; text-decoration: none;
+  white-space: nowrap;
+}
+.subject-subtask-group-label {
+  font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 0.03em;
+  margin: 10px 2px 2px;
+}
+.subject-subtask-group-label:first-child { margin-top: 2px; }
+
 </style>
 </head>
 <body>
@@ -994,6 +1078,11 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
       🌿 Mama
       <span class="tab-pts" id="mama-tab-pts">0% done</span>
     </button>
+  </div>
+
+  <div id="unlock-banner" style="display:none">
+    <span>🔓 Unlocked for <span id="unlock-mins">15</span> more min</span>
+    <button onclick="lockNow()">Lock now</button>
   </div>
 
   <div id="main-card">
@@ -1102,6 +1191,14 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
         <span style="font-size:0.82rem;font-weight:800;color:rgba(255,255,255,0.6)">🌻 Kata: <span id="s-kata-pts" style="color:#ffe066">0</span> pts</span>
       </div>
     </div>
+    <div class="settings-section">
+      <div class="settings-title">🎒 Classes &amp; Events</div>
+      <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);font-weight:600;margin-bottom:12px;line-height:1.5">
+        Recurring classes (like Co-op every Thursday) or one-off events (a field trip, a recital). Shows as a colored dot on the calendar and at the top of that day's view.
+      </p>
+      <div id="classes-list"></div>
+      <button class="settings-btn" onclick="openClassForm()" style="margin-top:4px;width:100%">+ Add Class or Event</button>
+    </div>
     <div class="settings-section" style="border-style:dashed;border-color:rgba(167,139,250,0.4)">
       <div class="settings-title">🎬 Demo Mode</div>
       <p style="font-size:0.8rem;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:10px;line-height:1.5">
@@ -1191,6 +1288,75 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   </div>
 </div>
 
+<!-- Parent PIN Modal -->
+<div id="pin-modal">
+  <div class="redeem-card">
+    <div style="font-size:2.5rem;margin-bottom:8px">🔑</div>
+    <h2>Enter Mom's Code</h2>
+    <p>Unlocks past days for editing on both tabs, for 15 minutes.</p>
+    <input id="pin-input" type="password" inputmode="numeric" maxlength="8" class="pin-input" placeholder="••••" onkeydown="if(event.key==='Enter')submitParentPin()">
+    <div id="pin-error" class="pin-error" style="display:none">Incorrect code</div>
+    <div class="redeem-actions">
+      <button class="redeem-cancel" onclick="closeParentPinModal()">Cancel</button>
+      <button class="redeem-confirm" onclick="submitParentPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Class or Event Modal -->
+<div id="class-modal">
+  <div class="avatar-modal-card class-modal-card">
+    <div class="avatar-modal-title" id="class-modal-title">Add Class or Event</div>
+    <input type="text" id="class-name" placeholder="Name" class="bonus-task-input class-modal-field" maxlength="60">
+    <div class="class-modal-row">
+      <select id="class-girl" class="kid-item-kind-select" style="flex:1">
+        <option value="both">Both girls</option>
+        <option value="celia">Celia only</option>
+        <option value="kata">Kata only</option>
+      </select>
+      <select id="class-category" class="kid-item-kind-select" style="flex:1">
+        <option value="">No category</option>
+      </select>
+    </div>
+    <div class="class-modal-row">
+      <button class="settings-btn" id="class-kind-recurring" onclick="setClassKind('recurring')" style="flex:1">📅 Weekly</button>
+      <button class="settings-btn" id="class-kind-oneoff" onclick="setClassKind('oneoff')" style="flex:1">📌 One-off</button>
+    </div>
+    <div id="class-recurring-fields">
+      <div class="class-dow-row" id="class-dow-row"></div>
+      <div class="class-modal-row">
+        <div style="flex:1">
+          <label class="class-field-label">Start date (optional)</label>
+          <input type="date" id="class-start-date" class="bonus-task-input class-modal-field">
+        </div>
+        <div style="flex:1">
+          <label class="class-field-label">End date (optional)</label>
+          <input type="date" id="class-end-date" class="bonus-task-input class-modal-field">
+        </div>
+      </div>
+    </div>
+    <div id="class-oneoff-fields" style="display:none">
+      <label class="class-field-label">Date</label>
+      <input type="date" id="class-oneoff-date" class="bonus-task-input class-modal-field">
+    </div>
+    <div class="class-modal-row">
+      <div style="flex:1">
+        <label class="class-field-label">Time (optional)</label>
+        <input type="time" id="class-time" class="bonus-task-input class-modal-field">
+      </div>
+      <div style="flex:1">
+        <label class="class-field-label">End time (optional)</label>
+        <input type="time" id="class-endtime" class="bonus-task-input class-modal-field">
+      </div>
+    </div>
+    <div id="class-form-error" class="pin-error" style="display:none">Please enter a name</div>
+    <div class="redeem-actions">
+      <button class="d-cancel" onclick="closeClassModal()">Cancel</button>
+      <button class="d-confirm" onclick="saveClassForm()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // IMAGES (embedded)
@@ -1241,7 +1407,6 @@ const TASKS_CELIA = [
   { id:"c_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
   { id:"c_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
   { id:"c_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
-  { id:"c_ice",  name:"Always Ice Cream 🍦",  pts:3, cat:"academic", week:null },
   { id:"c_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
   { id:"c_book", name:"Book study w/ Mom 📖", pts:2, cat:"academic", week:null },
   // Exercise
@@ -1265,7 +1430,6 @@ const TASKS_KATA = [
   { id:"k_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
   { id:"k_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
   { id:"k_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
-  { id:"k_mon",  name:"Monarch 👑",            pts:3, cat:"academic", week:null },
   { id:"k_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
   { id:"k_book", name:"Book study w/ Mom 📖", pts:2, cat:"academic", week:null },
   { id:"k_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null },
@@ -1769,6 +1933,14 @@ function loadDemoData() {
   setDemoStatus("✅ Demo data loaded. Import your real backup afterward to restore this device.");
 }
 
+// Must be declared before applyStateDefaults() runs (top of script) since
+// it calls buildBookStudyAssignments(), which depends on this — const
+// declarations aren't hoisted the way function declarations are, so this
+// can't live down next to WEEKLY_CLASSES/buildBookStudyAssignments where it
+// reads most naturally. (This exact ordering bug crashed the app on load
+// once already — see report.)
+const BOOK_STUDY_WEEK_ONE_MONDAY = "2026-08-10"; // confirmed Monday
+
 function applyStateDefaults() {
   if (!STATE.week)         STATE.week = "A";
   if (!STATE.celiaPts)    STATE.celiaPts = 0;
@@ -1799,7 +1971,28 @@ function applyStateDefaults() {
   if (!STATE.mamaIntention)   STATE.mamaIntention   = "";
   if (!STATE.mamaIntentionDate) STATE.mamaIntentionDate = "";
   if (!STATE.lastBackupAt)    STATE.lastBackupAt    = null;
+  // Dated-assignment system (Phase 4) — seeded once with Book Study content
+  // so it survives being edited later without needing to be re-imported.
+  if (!STATE.assignments)        STATE.assignments        = buildBookStudyAssignments();
+  if (!STATE.assignmentDoneByDate) STATE.assignmentDoneByDate = { celia: {}, kata: {} };
   if (STATE.demoDayOverride === undefined) STATE.demoDayOverride = null;
+  // Per-date completion (Phase 2) — celiaDone/kataDone above are left in
+  // place untouched (fallback if this ever needs reverting) but are no
+  // longer read from anywhere. On first run, seed today's key from
+  // whatever they currently hold so nothing already checked off vanishes.
+  if (!STATE.celiaDoneByDate) {
+    STATE.celiaDoneByDate = {};
+    STATE.celiaDoneByDate[toDateKey(new Date())] = { ...STATE.celiaDone };
+  }
+  if (!STATE.kataDoneByDate) {
+    STATE.kataDoneByDate = {};
+    STATE.kataDoneByDate[toDateKey(new Date())] = { ...STATE.kataDone };
+  }
+  if (STATE.parentUnlockUntil === undefined) STATE.parentUnlockUntil = 0;
+  // Classes & events (Phase 3) — seeded once with the two classes already
+  // in place before the add/edit/delete UI existed.
+  if (!STATE.classes) STATE.classes = buildInitialClasses();
+  if (!STATE.classDoneByDate) STATE.classDoneByDate = { celia: {}, kata: {} };
 }
 
 let STATE = loadState();
@@ -1817,11 +2010,99 @@ let avatarTarget = null;
 let uncheckPending = null;
 
 // ============================================================
+// PARENT PIN + PER-DATE LOCK (Phase 2)
+// A hardcoded PIN is a speed bump, not real security — it's sitting in
+// plain sight in this file's source. That's an acceptable tradeoff for
+// this app's threat model (keeping a curious kid from casually backfilling
+// or erasing history), but it should never be described as a real lock.
+// ============================================================
+// Change this value to set a different parent code.
+const PARENT_PIN = "2649";
+
+function getDoneMapForDate(girl, dateKey) {
+  const store = girl === "celia" ? STATE.celiaDoneByDate : STATE.kataDoneByDate;
+  if (!store[dateKey]) store[dateKey] = {};
+  return store[dateKey];
+}
+
+// 'editable' (today, or a past day during an active parent unlock),
+// 'past' (locked, tapping should prompt for the PIN), or
+// 'future' (never unlockable — planning-only, per the brief).
+function getDateLockState(dateKey) {
+  const todK = todayKey();
+  if (dateKey === todK) return "editable";
+  if (dateKey > todK) return "future";
+  return (Date.now() < STATE.parentUnlockUntil) ? "editable" : "past";
+}
+function isDateEditable(dateKey) {
+  return getDateLockState(dateKey) === "editable";
+}
+
+// dateKey isn't needed here — the unlock is app-wide, and the natural
+// re-render after a successful PIN just re-shows whatever calendarState
+// already points to (the same date the lock icon was tapped from).
+function openParentPinModal() {
+  const input = document.getElementById("pin-input");
+  input.value = "";
+  document.getElementById("pin-error").style.display = "none";
+  document.getElementById("pin-modal").classList.add("open");
+  setTimeout(() => input.focus(), 50);
+}
+function closeParentPinModal() {
+  document.getElementById("pin-modal").classList.remove("open");
+}
+function submitParentPin() {
+  const input = document.getElementById("pin-input");
+  const modal = document.getElementById("pin-modal");
+  if (input.value === PARENT_PIN) {
+    STATE.parentUnlockUntil = Date.now() + 15 * 60 * 1000;
+    saveState();
+    closeParentPinModal();
+    renderAll(); switchGirl(currentGirl); updateUnlockBanner();
+  } else {
+    document.getElementById("pin-error").style.display = "block";
+    input.value = "";
+    modal.classList.add("shake");
+    setTimeout(() => modal.classList.remove("shake"), 400);
+  }
+}
+function lockNow() {
+  STATE.parentUnlockUntil = 0;
+  saveState();
+  renderAll(); switchGirl(currentGirl); updateUnlockBanner();
+}
+// Keeps the "Unlocked for N more min" banner live without a full re-render,
+// and cleans up automatically once the window actually expires — the app
+// may sit backgrounded for hours, so this can't be the only thing gating
+// edits (every write path re-checks isDateEditable at the moment of write).
+function updateUnlockBanner() {
+  const banner = document.getElementById("unlock-banner");
+  if (!banner) return;
+  const msLeft = STATE.parentUnlockUntil - Date.now();
+  if (msLeft > 0) {
+    banner.style.display = "flex";
+    document.getElementById("unlock-mins").textContent = Math.ceil(msLeft / 60000);
+  } else {
+    banner.style.display = "none";
+    if (STATE.parentUnlockUntil !== 0) {
+      STATE.parentUnlockUntil = 0;
+      saveState();
+      renderAll(); switchGirl(currentGirl);
+    }
+  }
+}
+setInterval(updateUnlockBanner, 30000);
+
+// ============================================================
 // UNCHECK CONFIRM (prevents an accidental tap from silently
 // costing points — used by both regular tasks and bonus tasks)
 // ============================================================
-function requestUncheck(girl, id, pts, name) {
-  uncheckPending = { girl, id, pts };
+// source: "task" (default — regular/chore tasks, per-date done maps) or
+// "assignment" (Phase 4 dated assignments, assignmentDoneByDate). dateKey
+// is the date completion should be reverted on — re-checked at confirm
+// time in case an unlock window expired while the modal sat open.
+function requestUncheck(girl, id, pts, name, source, dateKey) {
+  uncheckPending = { girl, id, pts, source: source || "task", dateKey: dateKey || todayKey() };
   document.getElementById("uncheck-desc").textContent =
     `This will remove ${pts} ⭐ already earned for "${name}".`;
   document.getElementById("uncheck-modal").classList.add("open");
@@ -1832,9 +2113,15 @@ function closeUncheckModal() {
 }
 function confirmUncheck() {
   if (!uncheckPending) return;
-  const { girl, id, pts } = uncheckPending;
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  done[id] = false;
+  const { girl, id, pts, source, dateKey } = uncheckPending;
+  if (!isDateEditable(dateKey)) { closeUncheckModal(); return; }
+  if (source === "assignment") {
+    const a = STATE.assignments.find(x => x.id === id);
+    const dayMap = a && STATE.assignmentDoneByDate[girl] && STATE.assignmentDoneByDate[girl][a.date];
+    if (dayMap) dayMap[id] = false;
+  } else {
+    getDoneMapForDate(girl, dateKey)[id] = false;
+  }
   if (girl === "celia") STATE.celiaPts = Math.max(0, STATE.celiaPts - pts);
   else                  STATE.kataPts  = Math.max(0, STATE.kataPts  - pts);
   saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
@@ -1844,12 +2131,13 @@ function confirmUncheck() {
 // ============================================================
 // DAILY RESET
 // ============================================================
+// The girls' side of this is now redundant (Phase 2): completion lives in
+// celiaDoneByDate/kataDoneByDate, so a new day is naturally an empty key —
+// nothing to clear. Mama's reset is untouched and still fires here, since
+// her habit tracker has no per-date storage of its own.
 function checkDailyReset() {
   const today = new Date().toDateString();
   if (STATE.lastReset !== today) {
-    // ⚠️ ONLY clear task completion — NEVER touch points
-    STATE.celiaDone = {};
-    STATE.kataDone  = {};
     logMamaHistoryBeforeClear();
     STATE.mamaDone  = {};
     STATE.lastReset = today;
@@ -1871,9 +2159,15 @@ function logMamaHistoryBeforeClear() {
     STATE.mamaHistory = STATE.mamaHistory.slice(-90 * 20);
   }
 }
+// "Clear all tasks for today" — clears only today's entry in the per-date
+// stores (celiaDone/kataDone are no longer read from, so clearing them
+// would do nothing visible).
 function doReset() {
-  STATE.celiaDone = {};
-  STATE.kataDone  = {};
+  const tK = todayKey();
+  STATE.celiaDoneByDate[tK] = {};
+  STATE.kataDoneByDate[tK]  = {};
+  if (STATE.assignmentDoneByDate.celia) STATE.assignmentDoneByDate.celia[tK] = {};
+  if (STATE.assignmentDoneByDate.kata)  STATE.assignmentDoneByDate.kata[tK]  = {};
   logMamaHistoryBeforeClear();
   STATE.mamaDone  = {};
   STATE.lastReset = new Date().toDateString();
@@ -2018,7 +2312,6 @@ function buildMonthCalendarHTML(girl) {
   const startDow = firstOfMonth.getDay();
   const gridStart = new Date(year, month, 1 - startDow);
   const todK = todayKey();
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
 
   let cellsHTML = "";
   for (let i = 0; i < 42; i++) {
@@ -2030,14 +2323,20 @@ function buildMonthCalendarHTML(girl) {
     const dow = d.getDay();
     const isWeekend = dow === 0 || dow === 6;
 
-    // Phase 1 only has real completion data for today — see report; other
-    // days intentionally show neither bar nor star rather than a fake 0%.
+    // Real per-date completion now exists (Phase 2) for today and every
+    // past day — future days can't have completion yet (nothing to check
+    // off), so they intentionally show neither bar nor star.
     let barOrStarHTML = "";
     let ptsHTML = "";
-    if (isToday) {
-      const allT = [...getTasksForGirlOnDate(girl, dKey), ...getChoresForDate(dKey), ...getBonusTasks(girl)];
-      const totalCount = allT.length;
-      const doneCount = allT.filter(t => done[t.id]).length;
+    if (dKey <= todK) {
+      const doneMap = getDoneMapForDate(girl, dKey);
+      const regularT = [...getTasksForGirlOnDate(girl, dKey), ...getChoresForDate(dKey)];
+      const assignT = getAssignmentsForDate(girl, dKey);
+      const classesT = getClassesForDate(girl, dKey);
+      const totalCount = regularT.length + assignT.length + classesT.length;
+      const doneCount = regularT.filter(t => doneMap[t.id]).length
+        + assignT.filter(a => isAssignmentDone(girl, a)).length
+        + classesT.filter(c => isClassDone(girl, c.id, dKey)).length;
       const pct = totalCount ? Math.round(doneCount / totalCount * 100) : 0;
       if (totalCount > 0) {
         barOrStarHTML = (pct >= 100 && !isWeekend)
@@ -2045,18 +2344,26 @@ function buildMonthCalendarHTML(girl) {
           : `<div class="cal-progress-track"><div class="cal-progress-fill" style="width:${pct}%"></div></div>`;
       }
       const who = girl === "celia" ? "Celia" : "Kata";
-      const todayStr = new Date().toDateString();
-      const earnedToday = STATE.history
-        .filter(h => h.date === todayStr && h.who === who && h.pts > 0)
+      const dStr = d.toDateString();
+      const earned = STATE.history
+        .filter(h => h.date === dStr && h.who === who && h.pts > 0)
         .reduce((s, h) => s + h.pts, 0);
-      if (earnedToday > 0) ptsHTML = `<div class="cal-pts-corner">+${earnedToday}</div>`;
+      if (earned > 0) ptsHTML = `<div class="cal-pts-corner">+${earned}</div>`;
     }
 
     const cellClasses = ["cal-cell", "wk-" + wk.toLowerCase()];
     if (!inMonth) cellClasses.push("other-month");
     if (isToday) cellClasses.push("is-today");
 
-    const classDotHTML = getClassesForDate(girl, dKey).length ? `<span class="cal-class-dot"></span>` : "";
+    // One dot per distinct category scheduled that day, colored to match —
+    // see CLASS_CATEGORIES / the legend below.
+    const kidItemCategories = getKidItemsForDate(girl, dKey).filter(t => t.category).map(t => t.category);
+    const dayCategories = [...new Set([...getClassesForDate(girl, dKey).map(c => c.category), ...kidItemCategories])];
+    const classDotHTML = dayCategories.length
+      ? `<span class="cal-class-dots">${dayCategories.map(cat =>
+          `<span class="cal-class-dot" style="background:${(CLASS_CATEGORIES[cat]||{}).color||"#fff"}"></span>`
+        ).join("")}</span>`
+      : "";
 
     cellsHTML += `<button class="${cellClasses.join(" ")}" onclick="openDayDetail('${girl}','${dKey}')">
       <span class="cal-day-num">${d.getDate()}</span>
@@ -2066,6 +2373,10 @@ function buildMonthCalendarHTML(girl) {
     </button>`;
   }
 
+  const categoryLegendHTML = Object.values(CLASS_CATEGORIES).map(c =>
+    `<span class="cal-legend-item"><span class="cal-legend-swatch" style="background:${c.color}"></span>${escapeHtml(c.label)}</span>`
+  ).join("");
+
   return `
     <div class="cal-header">
       <button class="cal-nav-btn" onclick="calendarShiftMonth('${girl}',-1)">‹</button>
@@ -2073,12 +2384,9 @@ function buildMonthCalendarHTML(girl) {
       <button class="cal-nav-btn" onclick="calendarShiftMonth('${girl}',1)">›</button>
       <button class="cal-today-btn" onclick="calendarGoToday('${girl}')">Today</button>
     </div>
-    <div class="cal-legend">
-      <span class="cal-legend-item"><span class="cal-legend-swatch wk-a"></span>Week A</span>
-      <span class="cal-legend-item"><span class="cal-legend-swatch wk-b"></span>Week B</span>
-    </div>
     <div class="cal-dow-row">${["Su","Mo","Tu","We","Th","Fr","Sa"].map(l => `<div class="cal-dow">${l}</div>`).join("")}</div>
     <div class="cal-grid">${cellsHTML}</div>
+    <div class="cal-legend cal-legend-categories">${categoryLegendHTML}</div>
   `;
 }
 
@@ -2086,15 +2394,14 @@ function buildDayDetailHTML(girl, dateKey) {
   const d = parseDateKey(dateKey);
   const todK = todayKey();
   const isToday = dateKey === todK;
-  const isFuture = dateKey > todK;
-  const editable = isToday; // Phase 2 adds PIN-gated editing for past dates
+  const lockState = getDateLockState(dateKey); // 'editable' | 'past' | 'future'
+  const canAdd = canAddToDate(dateKey);
 
   const wk = weekForDate(dateKey);
   const dateLabel = d.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  const done = getDoneMapForDate(girl, dateKey);
   const tasks = getTasksForGirlOnDate(girl, dateKey);
   const chores = getChoresForDate(dateKey);
-  const legacyBonus = getBonusTasks(girl);
   const kidItems = getKidItemsForDate(girl, dateKey);
 
   let html = `<div class="day-detail-header">
@@ -2105,24 +2412,43 @@ function buildDayDetailHTML(girl, dateKey) {
     </div>
   </div>`;
 
-  // Classes (fixed weekly schedule) + kid-added events, timed classes first
-  // sorted by start time, untimed kid events last.
-  const classesToday = getClassesForDate(girl, dateKey);
+  // Classes (parent-editable, Settings) + kid-added events, sorted by
+  // start time with untimed entries last. Classes get a checkbox (no
+  // points, no confirmation to uncheck); kid events don't — they're just
+  // planning notes.
+  const classesToday = getClassesForDate(girl, dateKey).slice().sort((a, b) => {
+    if (!a.time && !b.time) return 0;
+    if (!a.time) return 1;
+    if (!b.time) return -1;
+    return a.time.localeCompare(b.time);
+  });
   const kidEvents = kidItems.filter(t => t.kind === "event");
+  const classEditable = lockState === "editable";
   html += `<div class="day-detail-events-section">
     <div class="cat-label">🎈 Classes &amp; Events</div>`;
   if (classesToday.length || kidEvents.length) {
     classesToday.forEach(c => {
-      const timeLabel = c.endTime ? `${c.time} – ${c.endTime}` : c.time;
-      html += `<div class="day-event-row">
-        <span class="task-name">${escapeHtml(c.name)}</span>
-        <span class="day-event-time">${escapeHtml(timeLabel)}</span>
+      const timeLabel = classTimeLabel(c);
+      const catColor = (CLASS_CATEGORIES[c.category] || {}).color || "#fff";
+      const isDone = isClassDone(girl, c.id, dateKey);
+      const clickAttr = classEditable ? `onclick="toggleClassDone('${girl}','${c.id}','${dateKey}')"`
+        : (lockState === "past" ? `onclick="openParentPinModal('${dateKey}')"` : "");
+      const disabledAttr = classEditable || lockState === "past" ? "" : "disabled";
+      html += `<div class="day-event-row ${isDone?"done":""}">
+        <button class="check-circle ${classEditable?"":"locked"}" ${clickAttr} ${disabledAttr}>${isDone?"✓":(classEditable?"":"🔒")}</button>
+        <span class="task-name"><span class="cal-legend-swatch" style="background:${catColor};display:inline-block;margin-right:7px;vertical-align:middle"></span>${escapeHtml(c.name)}</span>
+        ${timeLabel ? `<span class="day-event-time">${escapeHtml(timeLabel)}</span>` : ""}
       </div>`;
     });
     kidEvents.forEach(t => {
+      const catColor = t.category ? (CLASS_CATEGORIES[t.category] || {}).color : null;
+      const dotHTML = catColor ? `<span class="cal-legend-swatch" style="background:${catColor};display:inline-block;margin-right:7px;vertical-align:middle"></span>` : "";
+      const actionBtn = canAdd
+        ? `<button class="bonus-delete" onclick="deleteKidItem(event,'${girl}','${t.id}')">✕</button>`
+        : `<button class="bonus-delete" onclick="openParentPinModal('${dateKey}')">🔒</button>`;
       html += `<div class="day-event-row">
-        <span class="task-name">${escapeHtml(t.name)}</span>
-        ${(isToday || isFuture) ? `<button class="bonus-delete" onclick="deleteKidItem(event,'${girl}','${t.id}')">✕</button>` : ""}
+        <span class="task-name">${dotHTML}${escapeHtml(t.name)}</span>
+        ${actionBtn}
       </div>`;
     });
   } else {
@@ -2130,91 +2456,73 @@ function buildDayDetailHTML(girl, dateKey) {
   }
   html += `</div>`;
 
-  // Rotating Mon–Fri chore banner for this date
-  if (chores.length) {
-    const choreButtons = chores.map(t => {
-      const isDone = !!done[t.id];
-      const clickAttr = editable ? `onclick="toggleTask('${girl}','${t.id}',${t.pts},this)"` : "";
-      return `<button class="task-btn chores ${isDone?"done":""} ${!editable?"locked":""}" ${clickAttr} ${!editable?"disabled":""}>
-        <span class="check-circle">${isDone?"✓":(!editable?"🔒":"")}</span>
-        <span class="task-name">${t.name}</span>
-        <span class="task-pts-badge">+${t.pts} ⭐</span>
-      </button>`;
-    }).join("");
-    html += `<div class="daily-chore-section">
-      <div class="daily-chore-banner">
-        <div class="daily-chore-header">
-          <span class="daily-chore-day">📅 ${DAY_NAMES[d.getDay()]}</span>
-          <span class="daily-chore-title">Special Chore${chores.length>1?"s":""}</span>
-        </div>
-        ${choreButtons}
-      </div>
-    </div>`;
-  }
+  // Card grid: rotating chore + week-appropriate base tasks (colored by
+  // category) + Book Study/other assignment subjects, all in one flowing
+  // grid rather than a flat list grouped under headers.
+  const assignmentsBySubject = getAssignmentSubjectsForDate(girl, dateKey);
+  let cardsHTML = "";
 
-  // Week-appropriate base tasks, grouped by category
-  ["chores","academic","exercise","music"].forEach(cat => {
-    const catTasks = tasks.filter(t => t.cat === cat);
-    if (!catTasks.length) return;
-    const cc = CAT_COLORS[cat];
-    html += `<div class="cat-section">
-      <div class="cat-label"><span class="cat-dot" style="background:${cc.dot}"></span>${cc.label}</div>`;
-    catTasks.forEach(t => {
-      const isDone = !!done[t.id];
-      const clickAttr = editable ? `onclick="toggleTask('${girl}','${t.id}',${t.pts},this)"` : "";
-      html += `<button class="task-btn ${cc.cls} ${isDone?"done":""} ${!editable?"locked":""}" ${clickAttr} ${!editable?"disabled":""}>
-        <span class="check-circle">${isDone?"✓":(!editable?"🔒":"")}</span>
-        <span class="task-name">${t.name}</span>
-        <span class="task-pts-badge">+${t.pts} ⭐</span>
-      </button>`;
-    });
-    html += `</div>`;
+  chores.forEach(t => {
+    cardsHTML += buildSimpleCardHTML("chores", t.id, t.name, t.pts, !!done[t.id], lockState, dateKey,
+      `onclick="toggleTask('${girl}','${t.id}',${t.pts},this,'${dateKey}')"`);
   });
 
-  // Existing (points-bearing, mom-added) bonus tasks — unchanged mechanism.
-  // Only today's view keeps the live add-form/checkbox/delete controls.
-  if (isToday) {
-    html += buildBonusHTML(girl);
-  } else if (legacyBonus.length) {
-    html += `<div class="bonus-section">
-      <div class="bonus-label"><span class="bonus-dot"></span>✨ Bonus Tasks</div>`;
-    legacyBonus.forEach(t => {
-      const isDone = !!done[t.id];
-      html += `<div class="bonus-task-btn locked ${isDone?"done":""}">
-        <span class="check-circle" style="border-color:rgba(236,72,153,0.5);${isDone?"background:rgba(34,197,94,0.7);border-color:#22c55e":""}">${isDone?"✓":"🔒"}</span>
-        <span class="task-name">${escapeHtml(t.name)}</span>
-        <span class="task-pts-badge" style="background:rgba(236,72,153,0.25)">+${t.pts} ⭐</span>
-      </div>`;
+  ["chores","academic","exercise","music"].forEach(cat => {
+    const cc = CAT_COLORS[cat];
+    tasks.filter(t => t.cat === cat).forEach(t => {
+      cardsHTML += buildSimpleCardHTML(cc.cls, t.id, t.name, t.pts, !!done[t.id], lockState, dateKey,
+        `onclick="toggleTask('${girl}','${t.id}',${t.pts},this,'${dateKey}')"`);
     });
-    html += `</div>`;
+  });
+
+  Object.keys(assignmentsBySubject).forEach(subject => {
+    cardsHTML += buildSubjectCardHTML(girl, dateKey, subject, assignmentsBySubject[subject], lockState);
+  });
+
+  if (cardsHTML) {
+    html += `<div class="card-grid">${cardsHTML}</div>`;
   }
 
-  // Kid-added tasks (always worth 0 pts, never touch the completion bar/star)
+  // Kid-added tasks (always worth 0 pts, never touch the completion bar/star).
+  // Checking off follows the same lock as everything else; adding/deleting
+  // follows canAdd, which — unlike lockState — is never blocked on a future
+  // date (planning ahead is always allowed, only checking things off isn't).
   const kidTasks = kidItems.filter(t => t.kind === "task");
   html += `<div class="kid-item-section">
     <div class="cat-label">🖍️ ${girl==="celia"?"Celia's":"Kata's"} Added Items</div>`;
   kidTasks.forEach(t => {
     const isDone = !!done[t.id];
-    html += `<div class="kid-item-row ${isDone?"done":""}" onclick="toggleKidItemTask('${girl}','${t.id}')">
-      <span class="check-circle">${isDone?"✓":""}</span>
-      <span class="task-name">${escapeHtml(t.name)}</span>
-      <button class="bonus-delete" onclick="deleteKidItem(event,'${girl}','${t.id}')">✕</button>
+    const catColor = t.category ? (CLASS_CATEGORIES[t.category] || {}).color : null;
+    const dotHTML = catColor ? `<span class="cal-legend-swatch" style="background:${catColor};display:inline-block;margin-right:7px;vertical-align:middle"></span>` : "";
+    const rowEditable = lockState === "editable";
+    const clickAttr = rowEditable ? `onclick="toggleKidItemTask('${girl}','${t.id}')"`
+      : (lockState === "past" ? `onclick="openParentPinModal('${dateKey}')"` : "");
+    html += `<div class="kid-item-row ${isDone?"done":""} ${rowEditable?"":"locked"}" ${clickAttr}>
+      <span class="check-circle">${isDone?"✓":(rowEditable?"":"🔒")}</span>
+      <span class="task-name">${dotHTML}${escapeHtml(t.name)}</span>
+      <button class="bonus-delete" onclick="${canAdd ? `deleteKidItem(event,'${girl}','${t.id}')` : `openParentPinModal('${dateKey}')`}">✕</button>
     </div>`;
   });
   if (!kidTasks.length && !kidEvents.length) {
     html += `<div class="day-detail-empty">Nothing added yet</div>`;
   }
-  if (isToday || isFuture) {
+  if (canAdd) {
+    const categoryOptions = Object.entries(CLASS_CATEGORIES)
+      .map(([key, c]) => `<option value="${key}">${escapeHtml(c.label)}</option>`).join("");
     html += `<div class="kid-item-add-form">
       <input class="bonus-task-input" id="kid-item-name-${girl}" type="text" placeholder="Add a task or event…" maxlength="60">
       <select class="kid-item-kind-select" id="kid-item-kind-${girl}">
         <option value="task">Task</option>
         <option value="event">Event</option>
       </select>
+      <select class="kid-item-kind-select" id="kid-item-category-${girl}">
+        <option value="">No category</option>
+        ${categoryOptions}
+      </select>
       <button class="bonus-add-btn" onclick="addKidItem('${girl}','${dateKey}')">+ Add</button>
     </div>`;
   } else {
-    html += `<div class="day-detail-empty">🔒 Editing past days needs a parent code — coming in a future update</div>`;
+    html += `<button class="bonus-add-btn" onclick="openParentPinModal('${dateKey}')">🔒 Enter code to add</button>`;
   }
   html += `</div>`;
 
@@ -2232,14 +2540,24 @@ function getRawBonusTasks(girl) {
 function getKidItemsForDate(girl, dateKey) {
   return getRawBonusTasks(girl).filter(t => t.date === dateKey);
 }
+// Adding/deleting is exempt from the PIN on today and any future date —
+// only past dates need it (same as everything else). This is the one
+// place "editable" and "addable" diverge: a future day is never editable
+// (nothing to check off yet) but is always addable (planning ahead).
+function canAddToDate(dateKey) {
+  return dateKey >= todayKey() || isDateEditable(dateKey);
+}
 function addKidItem(girl, dateKey) {
+  if (!canAddToDate(dateKey)) { openParentPinModal(dateKey); return; }
   const nameEl = document.getElementById(`kid-item-name-${girl}`);
   const kindEl = document.getElementById(`kid-item-kind-${girl}`);
+  const catEl  = document.getElementById(`kid-item-category-${girl}`);
   const name = nameEl.value.trim();
   if (!name) { nameEl.focus(); return; }
   const kind = kindEl.value === "event" ? "event" : "task";
+  const category = CLASS_CATEGORIES[catEl.value] ? catEl.value : null;
   const id = "kiditem_" + girl + "_" + Date.now();
-  const item = { id, name, kind, date: dateKey, pts: 0 };
+  const item = { id, name, kind, date: dateKey, pts: 0, category };
   if (girl === "celia") { STATE.celiaBonusTasks = STATE.celiaBonusTasks || []; STATE.celiaBonusTasks.push(item); }
   else                  { STATE.kataBonusTasks  = STATE.kataBonusTasks  || []; STATE.kataBonusTasks.push(item); }
   saveState();
@@ -2247,14 +2565,20 @@ function addKidItem(girl, dateKey) {
 }
 function deleteKidItem(e, girl, id) {
   e.stopPropagation();
+  const raw = getRawBonusTasks(girl);
+  const item = raw.find(t => t.id === id);
+  if (item && !canAddToDate(item.date)) { openParentPinModal(item.date); return; }
   if (girl === "celia") STATE.celiaBonusTasks = (STATE.celiaBonusTasks || []).filter(t => t.id !== id);
   else                  STATE.kataBonusTasks  = (STATE.kataBonusTasks  || []).filter(t => t.id !== id);
   saveState();
   renderGirlView(girl); switchGirl(currentGirl);
 }
-// Kid tasks are worth 0 pts: no confirmation, no points/history side effects.
+// Kid tasks are worth 0 pts: no confirmation, no points/history side effects
+// — but still respect the same lock so a past day reads consistently.
 function toggleKidItemTask(girl, id) {
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  const item = getRawBonusTasks(girl).find(t => t.id === id);
+  if (!item || !isDateEditable(item.date)) return;
+  const done = getDoneMapForDate(girl, item.date);
   done[id] = !done[id];
   saveState();
   renderGirlView(girl); switchGirl(currentGirl);
@@ -2443,17 +2767,23 @@ function showView(view) {
 // ============================================================
 // TASK TOGGLE
 // ============================================================
-function toggleTask(girl, taskId, pts, btn) {
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  const taskName = btn.querySelector(".task-name").textContent;
+// dateKey defaults to today so every pre-Phase-2 call site (there are none
+// left, but just in case) keeps working unchanged. Backfilled points on a
+// past day go straight into the girl's current spendable total, same as
+// today's — there's no separate "historical" pool.
+function toggleTask(girl, taskId, pts, btn, dateKey) {
+  dateKey = dateKey || todayKey();
+  if (!isDateEditable(dateKey)) return; // re-checked here, not just at render
+  const done = getDoneMapForDate(girl, dateKey);
+  const taskName = btn.querySelector(".task-card-name").textContent;
   if (done[taskId]) {
-    requestUncheck(girl, taskId, pts, taskName);
+    requestUncheck(girl, taskId, pts, taskName, "task", dateKey);
     return;
   }
   done[taskId] = true;
   if (girl === "celia") STATE.celiaPts += pts;
   else                  STATE.kataPts  += pts;
-  addHistory(girl==="celia"?"Celia":"Kata", taskName, pts);
+  addHistory(girl==="celia"?"Celia":"Kata", taskName, pts, parseDateKey(dateKey).toDateString());
   celebrate(btn, pts);
   saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
 }
@@ -2577,8 +2907,10 @@ function closeAvatarModal() {
 // ============================================================
 function updateDashboard() {
   const cT = getTasksForGirl("celia"), kT = getTasksForGirl("kata");
-  const cD = cT.filter(t => STATE.celiaDone[t.id]).length;
-  const kD = kT.filter(t => STATE.kataDone[t.id]).length;
+  const cDone = getDoneMapForDate("celia", todayKey());
+  const kDone = getDoneMapForDate("kata", todayKey());
+  const cD = cT.filter(t => cDone[t.id]).length;
+  const kD = kT.filter(t => kDone[t.id]).length;
   const cP = cT.length ? Math.round(cD/cT.length*100) : 0;
   const kP = kT.length ? Math.round(kD/kT.length*100) : 0;
   document.getElementById("dash-cards").innerHTML = `
@@ -2623,6 +2955,7 @@ function updateSettingsView() {
   // Refresh the adjust panel display
   const disp = document.getElementById("adj-pts-display");
   if (disp) disp.textContent = adjGirl === "celia" ? STATE.celiaPts : STATE.kataPts;
+  renderClassesSettingsList();
 }
 
 function buildBgPicker() {
@@ -2683,9 +3016,14 @@ function adjustPts(girl, amount) {
   if (currentView === "girl") switchGirl(currentGirl);
 }
 
-function addHistory(who, task, pts) {
+// dateOverride (toDateString()-format, matching every other history entry)
+// lets a completion log against the date it belongs to rather than the date
+// it was actually checked off — used by Saturday Book Study catch-up so a
+// rolled-over Friday item still logs under Friday. Every existing call site
+// omits it and keeps logging under today, unchanged.
+function addHistory(who, task, pts, dateOverride) {
   const time = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-  STATE.history.unshift({ who, task, pts, time, date: new Date().toDateString() });
+  STATE.history.unshift({ who, task, pts, time, date: dateOverride || new Date().toDateString() });
   if (STATE.history.length > 100) STATE.history.pop();
   saveState();
 }
@@ -2758,18 +3096,550 @@ const DAILY_CHORES = {
 const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 // ============================================================
-// WEEKLY CLASSES — fixed recurring schedule, same hardcoded pattern as
-// DAILY_CHORES above. A full parent-editable STATE.classes list (one-off
-// events, add/edit/delete UI) is a bigger future update if that's wanted;
-// this covers "these classes happen every week" for now.
+// CLASSES & EVENTS (Phase 3) — parent-editable via Settings. Supports both
+// weekly recurring classes (daysOfWeek + optional startDate/endDate range)
+// and one-off events (date set, daysOfWeek empty).
 // ============================================================
-const WEEKLY_CLASSES = [
-  { id: "class_coop",  name: "Co-op",          girl: "both", daysOfWeek: [4], time: "9:00 AM",  endTime: "3:45 PM" },
-  { id: "class_music", name: "Music Lessons",  girl: "both", daysOfWeek: [1], time: "5:00 PM",  endTime: null },
-];
+// Category taxonomy for classes/events — each gets its own dot color on the
+// month grid, with a legend explaining what's what.
+const CLASS_CATEGORIES = {
+  coop:      { label: "Co-op Activity", color: "#fb923c" },
+  family:    { label: "Family",         color: "#34d399" },
+  braintree: { label: "Braintree",      color: "#60a5fa" },
+  personal:  { label: "Personal",       color: "#f472b6" },
+};
+
+// Seeded once on first run with the two classes already in place before the
+// full add/edit/delete UI existed, so they survive without re-entry.
+function buildInitialClasses() {
+  return [
+    { id: "class_coop",  name: "Co-op",         girl: "both", daysOfWeek: [4], date: null, startDate: null, endDate: null, time: "09:00", endTime: "15:45", category: "coop" },
+    { id: "class_music", name: "Music Lessons", girl: "both", daysOfWeek: [1], date: null, startDate: null, endDate: null, time: "17:00", endTime: null,    category: "personal" },
+  ];
+}
+
 function getClassesForDate(girl, dateKey) {
-  const dow = parseDateKey(dateKey).getDay();
-  return WEEKLY_CLASSES.filter(c => (c.girl === "both" || c.girl === girl) && c.daysOfWeek.includes(dow));
+  return STATE.classes.filter(c => {
+    if (c.girl !== "both" && c.girl !== girl) return false;
+    if (c.date) return c.date === dateKey; // one-off event — a single date
+    const dow = parseDateKey(dateKey).getDay();
+    if (!c.daysOfWeek || !c.daysOfWeek.includes(dow)) return false;
+    if (c.startDate && dateKey < c.startDate) return false;
+    if (c.endDate && dateKey > c.endDate) return false;
+    return true;
+  });
+}
+
+function formatTime12h(hhmm) {
+  if (!hhmm) return "";
+  const [h, m] = hhmm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, "0")} ${period}`;
+}
+function classTimeLabel(c) {
+  if (!c.time) return "";
+  return c.endTime ? `${formatTime12h(c.time)} – ${formatTime12h(c.endTime)}` : formatTime12h(c.time);
+}
+
+// ============================================================
+// CLASS COMPLETION — checkable, no points, own per-date store so it can
+// never leak into points math (classDoneByDate, keyed like
+// celiaDoneByDate). Counts as one item toward the day's progress bar/star,
+// same as any task or assignment sub-task — unweighted by anything since a
+// class has no point value to weight by.
+// ============================================================
+function isClassDone(girl, classId, dateKey) {
+  const dayMap = (STATE.classDoneByDate[girl] || {})[dateKey];
+  return !!(dayMap && dayMap[classId]);
+}
+// viewedDateKey follows the same today/past/future lock rules as tasks —
+// unlike adding, checking off a class can't happen on a future date.
+function toggleClassDone(girl, classId, viewedDateKey) {
+  if (!isDateEditable(viewedDateKey)) return;
+  if (!STATE.classDoneByDate[girl]) STATE.classDoneByDate[girl] = {};
+  if (!STATE.classDoneByDate[girl][viewedDateKey]) STATE.classDoneByDate[girl][viewedDateKey] = {};
+  const dayMap = STATE.classDoneByDate[girl][viewedDateKey];
+  dayMap[classId] = !dayMap[classId]; // no confirmation — nothing at stake
+  saveState();
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+
+// ============================================================
+// CLASSES & EVENTS — add/edit/delete UI (Settings)
+// ============================================================
+let editingClassId = null;
+let classFormKind = "recurring"; // 'recurring' | 'oneoff'
+let classFormDaysOfWeek = new Set();
+const DOW_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+function openClassForm(classId) {
+  editingClassId = classId || null;
+  const c = classId ? STATE.classes.find(x => x.id === classId) : null;
+
+  document.getElementById("class-modal-title").textContent = c ? "Edit Class or Event" : "Add Class or Event";
+  document.getElementById("class-name").value = c ? c.name : "";
+  document.getElementById("class-girl").value = c ? c.girl : "both";
+
+  const catSelect = document.getElementById("class-category");
+  catSelect.innerHTML = `<option value="">No category</option>` + Object.entries(CLASS_CATEGORIES)
+    .map(([key, cat]) => `<option value="${key}">${escapeHtml(cat.label)}</option>`).join("");
+  catSelect.value = (c && c.category) || "";
+
+  document.getElementById("class-start-date").value = (c && c.startDate) || "";
+  document.getElementById("class-end-date").value = (c && c.endDate) || "";
+  document.getElementById("class-oneoff-date").value = (c && c.date) || "";
+  document.getElementById("class-time").value = (c && c.time) || "";
+  document.getElementById("class-endtime").value = (c && c.endTime) || "";
+  document.getElementById("class-form-error").style.display = "none";
+
+  classFormDaysOfWeek = new Set(c && c.daysOfWeek ? c.daysOfWeek : []);
+  setClassKind(c && c.date ? "oneoff" : "recurring");
+  renderClassDowButtons();
+
+  document.getElementById("class-modal").classList.add("open");
+}
+function closeClassModal() {
+  document.getElementById("class-modal").classList.remove("open");
+  editingClassId = null;
+}
+function setClassKind(kind) {
+  classFormKind = kind;
+  document.getElementById("class-kind-recurring").classList.toggle("selected", kind === "recurring");
+  document.getElementById("class-kind-oneoff").classList.toggle("selected", kind === "oneoff");
+  document.getElementById("class-recurring-fields").style.display = kind === "recurring" ? "" : "none";
+  document.getElementById("class-oneoff-fields").style.display = kind === "oneoff" ? "" : "none";
+}
+function renderClassDowButtons() {
+  document.getElementById("class-dow-row").innerHTML = DOW_SHORT.map((label, i) =>
+    `<button type="button" class="class-dow-btn ${classFormDaysOfWeek.has(i)?"selected":""}" onclick="toggleClassFormDay(${i})">${label}</button>`
+  ).join("");
+}
+function toggleClassFormDay(dow) {
+  if (classFormDaysOfWeek.has(dow)) classFormDaysOfWeek.delete(dow);
+  else classFormDaysOfWeek.add(dow);
+  renderClassDowButtons();
+}
+function saveClassForm() {
+  const name = document.getElementById("class-name").value.trim();
+  if (!name) {
+    document.getElementById("class-form-error").style.display = "block";
+    document.getElementById("class-name").focus();
+    return;
+  }
+  const girl = document.getElementById("class-girl").value;
+  const category = document.getElementById("class-category").value || null;
+  const time = document.getElementById("class-time").value || "";
+  const endTime = document.getElementById("class-endtime").value || null;
+
+  const entry = {
+    id: editingClassId || ("class_" + Date.now()),
+    name, girl, category, time, endTime,
+    daysOfWeek: classFormKind === "recurring" ? Array.from(classFormDaysOfWeek).sort() : [],
+    date: classFormKind === "oneoff" ? (document.getElementById("class-oneoff-date").value || null) : null,
+    startDate: classFormKind === "recurring" ? (document.getElementById("class-start-date").value || null) : null,
+    endDate: classFormKind === "recurring" ? (document.getElementById("class-end-date").value || null) : null,
+  };
+
+  if (editingClassId) {
+    const idx = STATE.classes.findIndex(x => x.id === editingClassId);
+    if (idx !== -1) STATE.classes[idx] = entry;
+  } else {
+    STATE.classes.push(entry);
+  }
+  saveState();
+  closeClassModal();
+  renderAll(); switchGirl(currentGirl);
+}
+function deleteClassEntry(id) {
+  const c = STATE.classes.find(x => x.id === id);
+  if (!c) return;
+  if (!confirm(`Delete "${c.name}"? This can't be undone.`)) return;
+  STATE.classes = STATE.classes.filter(x => x.id !== id);
+  saveState();
+  renderAll(); switchGirl(currentGirl);
+}
+function renderClassesSettingsList() {
+  const el = document.getElementById("classes-list");
+  if (!el) return;
+  if (!STATE.classes.length) {
+    el.innerHTML = `<div class="day-detail-empty">No classes or events yet.</div>`;
+    return;
+  }
+  el.innerHTML = STATE.classes.map(c => {
+    const scheduleLabel = c.date
+      ? `One-off: ${c.date}`
+      : (c.daysOfWeek && c.daysOfWeek.length ? c.daysOfWeek.map(d => DOW_SHORT[d]).join(", ") : "No days set");
+    const rangeLabel = (c.startDate || c.endDate) ? ` (${c.startDate || "…"} – ${c.endDate || "…"})` : "";
+    const girlLabel = c.girl === "both" ? "Both girls" : (c.girl === "celia" ? "Celia only" : "Kata only");
+    const catLabel = c.category && CLASS_CATEGORIES[c.category] ? CLASS_CATEGORIES[c.category].label : "No category";
+    const catColor = c.category && CLASS_CATEGORIES[c.category] ? CLASS_CATEGORIES[c.category].color : "#888";
+    const timeLabel = classTimeLabel(c);
+    return `<div class="class-list-row">
+      <span class="cal-legend-swatch" style="background:${catColor};flex-shrink:0"></span>
+      <div class="class-list-info">
+        <div class="class-list-name">${escapeHtml(c.name)}</div>
+        <div class="class-list-meta">${escapeHtml(scheduleLabel)}${rangeLabel} · ${escapeHtml(girlLabel)} · ${escapeHtml(catLabel)}${timeLabel ? " · " + escapeHtml(timeLabel) : ""}</div>
+      </div>
+      <div class="class-list-actions">
+        <button onclick="openClassForm(${jsAttr(c.id)})">Edit</button>
+        <button class="danger" onclick="deleteClassEntry(${jsAttr(c.id)})">Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ============================================================
+// BOOK STUDY — seed content for the general assignments system (Phase 4).
+// One chapter = one weekday (Weeks 1-3: Mon-Fri = chapters 1-5 of that
+// week; Week 4: Mon-Fri = chapters 16-20, Sat = chapter 21 by design — the
+// richest single day, per the source brief). Illustrated Dictionary recurs
+// Mon-Fri every week (1pt); Book Report Booklet is once per week, Monday
+// (2pts). Point values: chapter read+narrate=2, each Discuss=1, each
+// Explore=2, each Make=2 — exactly as specified in the brief.
+//
+// Two content notes, flagged as requested:
+// 1. Week Two's "three bugle calls" Explore item (Ch10) names three
+//    separate videos (Mess Call, Reveille, TAPS) but this schema only
+//    supports one link per sub-task. Kept as a single 2pt item (matching
+//    the single Explore activity in the source) linked to "Mess Call";
+//    Reveille/TAPS are named in the task text but have no button of their
+//    own. The brief's noted "7 named vs 8 URLs" ambiguity resolved cleanly
+//    once matched 1:1 against the actual labeled links — the 8th URL was
+//    this bugle-calls item needing 3 slots, not a second compass video.
+// 2. The brief's own summary of chapter 21 ("a poem discussion, 'crepuscular'...")
+//    conflicts with the verbatim source text, which explicitly tags the
+//    poem-discussion question to chapter 19, not 21. Followed the explicit
+//    per-item chapter tags (the more precise signal) over the loose summary
+//    — so Ch19/Thursday keeps the poem discussion, and Ch21/Saturday's
+//    tally (9pts) is not actually the study's highest day; Ch8/Wednesday of
+//    Week Two (13pts) is.
+// ============================================================
+function buildBookStudyAssignments() {
+  const monday = parseDateKey(BOOK_STUDY_WEEK_ONE_MONDAY);
+  function dateFor(weekIdx, dayOffset) {
+    const d = new Date(monday);
+    d.setDate(d.getDate() + weekIdx * 7 + dayOffset);
+    return toDateKey(d);
+  }
+  const A = [];
+  let n = 0;
+  function add(weekIdx, dayOffset, name, pts, link, linkLabel) {
+    A.push({
+      id: "bs_" + (++n), subject: "bookstudy", girl: "both",
+      date: dateFor(weekIdx, dayOffset), name, pts,
+      link: link || null, linkLabel: linkLabel || null,
+    });
+  }
+  const MON=0, TUE=1, WED=2, THU=3, FRI=4, SAT=5;
+
+  // ── Week 1 (chapters 1-5) ──────────────────────────────────
+  add(0, MON, "Read & narrate: Chapter 1", 2);
+  add(0, MON, "Discuss: Is there anything special you think about to help you fall asleep?", 1);
+  add(0, MON, "Book Report Booklet: Begin", 2);
+  add(0, MON, "Illustrated Dictionary", 1);
+
+  add(0, TUE, "Read & narrate: Chapter 2", 2);
+  add(0, TUE, "Discuss: Have you ever imagined animals talking to each other, like friends? What might they say?", 1);
+  add(0, TUE, "Make: Nest scene (paper bowls, cotton balls, natural materials)", 2);
+  add(0, TUE, "Illustrated Dictionary", 1);
+
+  add(0, WED, "Read & narrate: Chapter 3", 2);
+  add(0, WED, "Discuss: The book says birds don't like to be stared at — do you think that's true?", 1);
+  add(0, WED, "Make: Birds' nest treats", 2);
+  add(0, WED, "Illustrated Dictionary", 1);
+
+  add(0, THU, "Read & narrate: Chapter 4", 2);
+  add(0, THU, "Discuss: What would you like to be when you grow up?", 1);
+  add(0, THU, "Explore: Watch cygnets learn to swim, write 1-2 observations", 2, "https://www.youtube.com/watch?v=rJNMx6i1N4k", "Watch: Swan Cygnets First Swim");
+  add(0, THU, "Make: Cygnet hand puppets (socks)", 2);
+  add(0, THU, "Illustrated Dictionary", 1);
+
+  add(0, FRI, "Read & narrate: Chapter 5", 2);
+  add(0, FRI, "Discuss: Louis feels different because he can't make sounds like swans. Have you ever felt different?", 1);
+  add(0, FRI, "Explore: Track Louis's movements on a US map with star stickers + yarn", 2);
+  add(0, FRI, "Explore: How swans communicate without sound — draw swan signals", 2);
+  add(0, FRI, "Make: Create and play water games", 2);
+  add(0, FRI, "Illustrated Dictionary", 1);
+
+  // ── Week 2 (chapters 6-10) ─────────────────────────────────
+  add(1, MON, "Read & narrate: Chapter 6", 2);
+  add(1, MON, "Discuss: What steps does father do to teach them how to fly? Is this a good way to learn?", 1);
+  add(1, MON, "Explore: Animal migration — why do swans migrate?", 2, "https://www.youtube.com/watch?v=hMAS4SdPj-w", "Migrations: Big Animal Trips");
+  add(1, MON, "Book Report Booklet: Continue", 2);
+  add(1, MON, "Illustrated Dictionary", 1);
+
+  add(1, TUE, "Read & narrate: Chapter 7", 2);
+  add(1, TUE, "Discuss: Why is it important for Louis to learn to read and write?", 1);
+  add(1, TUE, "Make: Pack a picnic (PB sandwiches, bananas, apples, cookies, eggs, pop)", 2);
+  add(1, TUE, "Illustrated Dictionary", 1);
+
+  add(1, WED, "Read & narrate: Chapter 8", 2);
+  add(1, WED, "Learn: Slate spelling practice (cat-catastrophe, bug-bugle, duck-duckling, pen-penmanship, bell-bellhop, bath-bathtub, run-runway, hat-hatched, can-cancel, cap-captain)", 2);
+  add(1, WED, "Explore: Cardinal directions — draw a compass on your map", 2, "https://www.youtube.com/watch?v=EUqMTGrb-gM", "Cardinal Directions for Kids");
+  add(1, WED, "Explore: Watch/listen to trumpeter swan sounds", 2, "https://www.youtube.com/watch?v=ibLedhew2r0", "Trumpeter Swans \"Trumpeting\"");
+  add(1, WED, "Make: Paper compass rose", 2, "https://glamperlife.com/paper-plate-compass-craft/", "Paper Plate Compass Craft");
+  add(1, WED, "Make: Model of a trumpet", 2, "https://www.teatimeteachables.com/cardboard-tube-toy-trumpet-craft/", "Cardboard Tube Toy Trumpet");
+  add(1, WED, "Illustrated Dictionary", 1);
+
+  add(1, THU, "Read & narrate: Chapter 9", 2);
+  add(1, THU, "Discuss: Share your opinion of the cob stealing a trumpet for Louis. Do you agree with his decision?", 1);
+  add(1, THU, "Illustrated Dictionary", 1);
+
+  add(1, FRI, "Read & narrate: Chapter 10", 2);
+  add(1, FRI, "Discuss: What advice would you give when trying something new, like camp or new friends?", 1);
+  add(1, FRI, "Explore: Listen to three bugle calls (Mess Call, Reveille, TAPS), compare to the trumpeter swan", 2, "https://www.youtube.com/watch?v=jnf1r_lNE2w", "Mess Call");
+  add(1, FRI, "Illustrated Dictionary", 1);
+
+  // ── Week 3 (chapters 11-15) ────────────────────────────────
+  add(2, MON, "Read & narrate: Chapter 11", 2);
+  add(2, MON, "Discuss: What do you think of pistachio ice cream and birds? Your biggest likes/dislikes?", 1);
+  add(2, MON, "Make: Toast marshmallows, sing camp songs", 2);
+  add(2, MON, "Book Report Booklet: Continue", 2);
+  add(2, MON, "Illustrated Dictionary", 1);
+
+  add(2, TUE, "Read & narrate: Chapter 12", 2);
+  add(2, TUE, "Discuss: Was it safe for Applegate to go in the canoe? A time you broke a rule and faced consequences?", 1);
+  add(2, TUE, "Explore: Learn about skunks — why do they spray? Write a summary", 2, "https://www.youtube.com/watch?v=5RiErxwrVQ0", "Watch: Meet a Skunk");
+  add(2, TUE, "Explore: Draw a picture of a skunk", 2, "https://www.youtube.com/watch?v=8pz1LQo3APg", "Watch: How To Draw A Skunk");
+  add(2, TUE, "Make: Paper bag skunk", 2, "https://iheartcraftythings.com/paper-bag-skunk-craft-for-kids.html", "Paper Bag Skunk Craft");
+  add(2, TUE, "Illustrated Dictionary", 1);
+
+  add(2, WED, "Read & narrate: Chapter 13", 2);
+  add(2, WED, "Discuss: Talk about something hard but important, like Louis carrying everything to Boston", 1);
+  add(2, WED, "Explore: Sketch and label a trumpet diagram (three valves)", 2);
+  add(2, WED, "Explore: Locate Boston, MA on the map", 2);
+  add(2, WED, "Illustrated Dictionary", 1);
+
+  add(2, THU, "Read & narrate: Chapter 14", 2);
+  add(2, THU, "Discuss: Why do you think getting a job in Boston was a big deal for Louis?", 1);
+  add(2, THU, "Explore: Virtual field trip — Boston Public Gardens swan boats", 2, "https://www.youtube.com/watch?v=3fyQtUjqY3M", "Watch: Boston Swan Boats & Public Garden");
+  add(2, THU, "Make: Swan boat", 2, "https://www.designsbymissmandee.com/2022/03/swan-boats/", "Make: Swan Boats");
+  add(2, THU, "Illustrated Dictionary", 1);
+
+  add(2, FRI, "Read & narrate: Chapter 15", 2);
+  add(2, FRI, "Discuss: Does Louis enjoy staying at the Ritz? How does a hotel make him feel?", 1);
+  add(2, FRI, "Make: Write postcards from Camp Kookooskoos and Boston (Louis to Sam)", 2);
+  add(2, FRI, "Illustrated Dictionary", 1);
+
+  // ── Week 4 (chapters 16-21, chapter 21 on Saturday) ────────
+  add(3, MON, "Read & narrate: Chapter 16", 2);
+  add(3, MON, "Discuss: Share about an item of yours that you take extra special care of", 1);
+  add(3, MON, "Explore: Locate Philadelphia, PA on the map", 2);
+  add(3, MON, "Book Report Booklet: Finish", 2);
+  add(3, MON, "Book Report cover: Replicate or recreate it", 2);
+  add(3, MON, "Illustrated Dictionary", 1);
+
+  add(3, TUE, "Read & narrate: Chapter 17", 2);
+  add(3, TUE, "Discuss: Have you had a big, deep feeling like divers and the \"rapture of the deep\"?", 1);
+  add(3, TUE, "Explore: Draw divers enjoying the \"rapture of the deep\" underwater", 2);
+  add(3, TUE, "Illustrated Dictionary", 1);
+
+  add(3, WED, "Read & narrate: Chapter 18", 2);
+  add(3, WED, "Discuss: Talk about a time you helped someone or something that needed protecting", 1);
+  add(3, WED, "Explore: Virtual field trip — meet the animals at the Philadelphia Zoo", 2, "https://www.philadelphiazoo.org/animals/", "Meet our Animals: Philadelphia Zoo");
+  add(3, WED, "Make: Philadelphia Zoo model (Legos or blocks)", 2);
+  add(3, WED, "Illustrated Dictionary", 1);
+
+  add(3, THU, "Read & narrate: Chapter 19", 2);
+  add(3, THU, "Discuss: Reread Sam's poem — why leave it for the headman, and what does it show?", 1);
+  add(3, THU, "Illustrated Dictionary", 1);
+
+  add(3, FRI, "Read & narrate: Chapter 20", 2);
+  add(3, FRI, "Illustrated Dictionary", 1);
+
+  add(3, SAT, "Read & narrate: Chapter 21", 2);
+  add(3, SAT, "Discuss: What do you think \"crepuscular\" means? Guess, then look up the real definition", 1);
+  add(3, SAT, "Explore: Learn to play Row Row Row Your Boat (piano or kazoo)", 2, "https://www.musicallthetime.com/piano/row-row-row-your-boat-piano-sheet-music.html", "Row, Row, Row Your Boat Sheet Music");
+  add(3, SAT, "Make: Write a letter to someone and mail it with a real stamp", 2);
+  add(3, SAT, "Make: Handprint art of Louis and Serena", 2, "https://www.gluedtomycraftsblog.com/2020/03/painted-handprint-swan.html", "Swan Handprint");
+
+  return A;
+}
+
+// ============================================================
+// DATED ASSIGNMENTS (general system, Phase 4) — a subject with any
+// STATE.assignments entries on a date renders as a sub-task card; a
+// subject with none that day simply doesn't appear. Book Study is the
+// first (and currently only) subject, but this isn't Book-Study-specific.
+// ============================================================
+// Subjects with content Mon-Fri only naturally roll unfinished Fri work
+// onto Saturday (see 4.4) — books study is currently the only subject that
+// opts into this via SUBJECTS_WITH_WEEKEND_CATCHUP.
+const SUBJECTS_WITH_WEEKEND_CATCHUP = ["bookstudy"];
+
+// Assignments actually scheduled/visible for a date: items literally dated
+// that day, plus — on a Saturday, for catch-up subjects — any Mon-Fri item
+// from that same week still unfinished, so a girl always sees today's real
+// work-list, not just what's nominally "assigned" to today.
+function getAssignmentsForDate(girl, dateKey) {
+  let items = STATE.assignments.filter(a => (a.girl === "both" || a.girl === girl) && a.date === dateKey);
+
+  const d = parseDateKey(dateKey);
+  if (d.getDay() === 6) { // Saturday — check Mon-Fri of this same week for stragglers
+    const doneMap = (STATE.assignmentDoneByDate[girl] || {});
+    for (let i = 5; i >= 1; i--) {
+      const wd = new Date(d);
+      wd.setDate(d.getDate() - i);
+      const wdKey = toDateKey(wd);
+      const wdDone = doneMap[wdKey] || {};
+      const stragglers = STATE.assignments.filter(a =>
+        (a.girl === "both" || a.girl === girl) && a.date === wdKey &&
+        SUBJECTS_WITH_WEEKEND_CATCHUP.includes(a.subject) && !wdDone[a.id]
+      );
+      items = items.concat(stragglers);
+    }
+  }
+  return items;
+}
+
+// Groups a date's assignments by subject, e.g. { bookstudy: [...] } —
+// each key becomes one subject card in the day-detail grid.
+function getAssignmentSubjectsForDate(girl, dateKey) {
+  const bySubject = {};
+  getAssignmentsForDate(girl, dateKey).forEach(a => {
+    (bySubject[a.subject] = bySubject[a.subject] || []).push(a);
+  });
+  return bySubject;
+}
+
+const SUBJECT_LABELS = { bookstudy: "📖 Book Study" };
+
+function isAssignmentDone(girl, a) {
+  const dayMap = ((STATE.assignmentDoneByDate[girl] || {})[a.date]) || {};
+  return !!dayMap[a.id];
+}
+
+// Assignment sub-tasks are graded exactly like a task — same points/history
+// flow — just sourced from STATE.assignments instead of TASKS_CELIA/KATA,
+// and stored in their own per-date map so they can never leak into the
+// plain done-maps or count toward the calendar star for a day they didn't
+// originate on. Completion is recorded under the assignment's own `date`
+// (its original day), not whichever day it's being viewed/checked from —
+// this is what makes Saturday catch-up log correctly against Friday.
+// viewedDateKey is the day-detail page currently on screen — gating reads
+// that (can I interact with what I'm looking at right now?), while storage
+// always uses the assignment's own a.date (its canonical/original day).
+// These differ for a Saturday catch-up straggler: viewing today=Saturday
+// makes a rolled-over Friday item interactive, even though Friday itself
+// is now in the past.
+function toggleAssignment(girl, assignmentId, btn, viewedDateKey) {
+  const a = STATE.assignments.find(x => x.id === assignmentId);
+  if (!a) return;
+  viewedDateKey = viewedDateKey || todayKey();
+  if (!isDateEditable(viewedDateKey)) return;
+  if (isAssignmentDone(girl, a)) {
+    requestUncheck(girl, assignmentId, a.pts, a.name, "assignment", viewedDateKey);
+    return;
+  }
+  if (!STATE.assignmentDoneByDate[girl]) STATE.assignmentDoneByDate[girl] = {};
+  if (!STATE.assignmentDoneByDate[girl][a.date]) STATE.assignmentDoneByDate[girl][a.date] = {};
+  STATE.assignmentDoneByDate[girl][a.date][assignmentId] = true;
+  if (girl === "celia") STATE.celiaPts += a.pts;
+  else                  STATE.kataPts  += a.pts;
+  const subjectLabel = SUBJECT_LABELS[a.subject] || a.subject;
+  addHistory(girl === "celia" ? "Celia" : "Kata", `${subjectLabel}: ${a.name}`, a.pts, parseDateKey(a.date).toDateString());
+  if (btn) celebrate(btn, a.pts);
+  saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
+}
+
+// ============================================================
+// CARD GRID (Phase 4) — replaces the flat, category-grouped checklist.
+// Simple cards (chores, base tasks): tap toggles completion, same
+// instant-check/celebration/confirm-uncheck/lock rules as the checkbox
+// version. A completed card keeps its name and fills the rest with a big
+// star. Subject cards (Book Study) expand in place to reveal sub-tasks.
+// ============================================================
+// lockState: 'editable' (normal onclickAttr), 'past' (tappable — opens the
+// PIN modal instead of toggling), or 'future' (fully disabled, no click at
+// all — a future day is never unlockable, per the brief).
+function buildSimpleCardHTML(cardCls, id, name, pts, isDone, lockState, dateKey, onclickAttr) {
+  const locked = lockState !== "editable";
+  const lockedCls = locked ? "locked" : "";
+  let clickAttr = "";
+  let disabledAttr = "";
+  if (lockState === "editable") clickAttr = onclickAttr;
+  else if (lockState === "past") clickAttr = `onclick="openParentPinModal('${dateKey}')"`;
+  else disabledAttr = "disabled";
+
+  if (isDone) {
+    return `<button class="task-card ${cardCls} done ${lockedCls}" ${clickAttr} ${disabledAttr}>
+      <div class="task-card-name">${name}</div>
+      <div class="task-card-star-fill">⭐</div>
+    </button>`;
+  }
+  return `<button class="task-card ${cardCls} ${lockedCls}" ${clickAttr} ${disabledAttr}>
+    <div class="task-card-name">${name}</div>
+    <div class="task-card-pts">${locked ? "🔒" : `+${pts} ⭐`}</div>
+  </button>`;
+}
+
+// Tracks which subject card(s) are expanded per girl, in memory only.
+const expandedSubjectCards = { celia: new Set(), kata: new Set() };
+function toggleSubjectCardExpand(girl, subject, dateKey) {
+  const key = subject + "|" + dateKey;
+  const set = expandedSubjectCards[girl];
+  if (set.has(key)) set.delete(key); else set.add(key);
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+
+function buildSubjectCardHTML(girl, dateKey, subject, items, lockState) {
+  const label = SUBJECT_LABELS[subject] || subject;
+  const totalPts = items.reduce((s, a) => s + a.pts, 0);
+  const doneItems = items.filter(a => isAssignmentDone(girl, a));
+  const donePts = doneItems.reduce((s, a) => s + a.pts, 0);
+  const allDone = items.length > 0 && doneItems.length === items.length;
+  const expanded = expandedSubjectCards[girl].has(subject + "|" + dateKey);
+
+  if (allDone && !expanded) {
+    // Still tappable — re-expands so an individual sub-task can be
+    // unchecked (through the normal confirm-uncheck flow) rather than
+    // becoming a dead end once everything's complete.
+    return `<div class="task-card subject-card done" onclick="toggleSubjectCardExpand('${girl}','${subject}','${dateKey}')">
+      <div class="task-card-name">${escapeHtml(label)}</div>
+      <div class="task-card-star-fill">⭐</div>
+    </div>`;
+  }
+
+  const editable = lockState === "editable";
+  function rowsFor(list) {
+    return list.map(a => {
+      const isDone = isAssignmentDone(girl, a);
+      let clickAttr = "";
+      let disabledAttr = "";
+      if (editable) clickAttr = `onclick="toggleAssignment('${girl}','${a.id}',this,'${dateKey}')"`;
+      else if (lockState === "past") clickAttr = `onclick="openParentPinModal('${dateKey}')"`;
+      else disabledAttr = "disabled";
+      const linkBtn = a.link
+        ? `<a class="subject-subtask-link" href="${escapeHtml(a.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escapeHtml(a.linkLabel || "Open")}</a>`
+        : "";
+      return `<div class="subject-subtask-row ${isDone?"done":""}">
+        <button class="check-circle ${!editable?"locked":""}" ${clickAttr} ${disabledAttr}>${isDone?"✓":(!editable?"🔒":"")}</button>
+        <span class="task-name">${escapeHtml(a.name)}</span>
+        <span class="task-pts-badge">+${a.pts} ⭐</span>
+        ${linkBtn}
+      </div>`;
+    }).join("");
+  }
+
+  // A Saturday can hold both its own content (Week 4's chapter 21) and
+  // stragglers rolled over from earlier in the week — group them
+  // separately so one doesn't crowd out or get lost in the other.
+  const ownItems = items.filter(a => a.date === dateKey);
+  const rolledItems = items.filter(a => a.date !== dateKey);
+  const subtaskHTML = (ownItems.length && rolledItems.length)
+    ? `<div class="subject-subtask-group-label">Today</div>${rowsFor(ownItems)}
+       <div class="subject-subtask-group-label">Catching up from this week</div>${rowsFor(rolledItems)}`
+    : rowsFor(items);
+
+  return `<div class="task-card subject-card ${expanded?"expanded":""}">
+    <div class="subject-card-header" onclick="toggleSubjectCardExpand('${girl}','${subject}','${dateKey}')">
+      <div class="task-card-name">${escapeHtml(label)}</div>
+      <div class="subject-card-progress">${donePts} of ${totalPts} pts</div>
+      <span class="subject-card-chevron">›</span>
+    </div>
+    ${expanded ? `<div class="subject-subtask-list">${subtaskHTML}</div>` : ""}
+  </div>`;
 }
 
 // Real day-of-week, unless a demo override is active (see loadDemoData()) —
@@ -2780,143 +3650,6 @@ function getEffectiveDayOfWeek() {
     ? STATE.demoDayOverride
     : new Date().getDay();
 }
-
-function getTodayChores() {
-  const day = getEffectiveDayOfWeek();
-  return DAILY_CHORES[day] || [];
-}
-
-function getDayLabel() {
-  const day = getEffectiveDayOfWeek();
-  if (day === 0 || day === 6) return null; // weekend
-  return DAY_NAMES[day];
-}
-
-function buildDailyChoreHTML(girl) {
-  const chores = getTodayChores();
-  const dayLabel = getDayLabel();
-  if (!chores.length) {
-    const isWeekend = [0,6].includes(new Date().getDay());
-    if (isWeekend) {
-      return `<div class="daily-chore-section">
-        <div class="daily-chore-banner">
-          <div class="daily-chore-header">
-            <span class="daily-chore-day">Weekend 🌟</span>
-            <span class="daily-chore-title">No special chore today — enjoy your day!</span>
-          </div>
-        </div>
-      </div>`;
-    }
-    return '';
-  }
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  let choreButtons = chores.map(t => {
-    const isDone = !!done[t.id];
-    return `<button class="task-btn chores ${isDone?"done":""}" onclick="toggleTask('${girl}','${t.id}',${t.pts},this)">
-      <span class="check-circle">${isDone?"✓":""}</span>
-      <span class="task-name">${t.name}</span>
-      <span class="task-pts-badge">+${t.pts} ⭐</span>
-    </button>`;
-  }).join('');
-  return `<div class="daily-chore-section">
-    <div class="daily-chore-banner">
-      <div class="daily-chore-header">
-        <span class="daily-chore-day">📅 ${dayLabel}</span>
-        <span class="daily-chore-title">Today's Special Chore${chores.length>1?"s":""}</span>
-      </div>
-      ${choreButtons}
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// BONUS TASKS
-// ============================================================
-// Legacy, always-shown, points-bearing bonus tasks (mom-added). Date-scoped
-// kid items (added from the calendar day view) live in the same array but
-// are excluded here and shown separately — see getKidItemsForDate().
-function getBonusTasks(girl) {
-  return getRawBonusTasks(girl).filter(t => !t.date);
-}
-
-function buildBonusHTML(girl) {
-  const bonus = getBonusTasks(girl);
-  const done  = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  let listHTML = bonus.map((t,i) => {
-    const isDone = !!done[t.id];
-    return `<div class="bonus-task-btn ${isDone?"done":""}" onclick="toggleBonus('${girl}',${i},this)">
-      <span class="check-circle" style="border-color:rgba(236,72,153,0.5);${isDone?"background:rgba(34,197,94,0.7);border-color:#22c55e":""}">
-        ${isDone?"✓":""}
-      </span>
-      <span class="task-name">${escapeHtml(t.name)}</span>
-      <span class="task-pts-badge" style="background:rgba(236,72,153,0.25)">+${t.pts} ⭐</span>
-      ${!isDone ? `<button class="bonus-delete" onclick="deleteBonus(event,'${girl}',${i})">✕</button>` : ""}
-    </div>`;
-  }).join('');
-
-  return `<div class="bonus-section">
-    <div class="bonus-label"><span class="bonus-dot"></span>✨ Bonus Tasks</div>
-    <div class="bonus-input-row">
-      <input class="bonus-task-input" id="bonus-name-${girl}" type="text"
-        placeholder="Add your own task…" maxlength="60">
-      <input class="bonus-pts-input" id="bonus-pts-${girl}" type="number"
-        placeholder="pts" min="1" max="50" value="2">
-      <button class="bonus-add-btn" onclick="addBonusTask('${girl}')">+ Add</button>
-    </div>
-    ${listHTML}
-  </div>`;
-}
-
-function addBonusTask(girl) {
-  const nameEl = document.getElementById("bonus-name-" + girl);
-  const ptsEl  = document.getElementById("bonus-pts-"  + girl);
-  const name = nameEl.value.trim();
-  const pts  = Math.max(1, Math.min(50, parseInt(ptsEl.value) || 2));
-  if (!name) { nameEl.focus(); return; }
-  const id = "bonus_" + girl + "_" + Date.now();
-  const task = { id, name, pts };
-  if (girl === "celia") {
-    STATE.celiaBonusTasks = STATE.celiaBonusTasks || [];
-    STATE.celiaBonusTasks.push(task);
-  } else {
-    STATE.kataBonusTasks = STATE.kataBonusTasks || [];
-    STATE.kataBonusTasks.push(task);
-  }
-  nameEl.value = ""; ptsEl.value = "2";
-  saveState(); renderGirlView(girl); switchGirl(currentGirl);
-}
-
-function deleteBonus(e, girl, idx) {
-  e.stopPropagation();
-  // idx is the index within getBonusTasks(girl) (the filtered, legacy-only
-  // list actually rendered) — look up by id rather than splicing the raw
-  // array directly, since the raw array may also hold date-scoped kid items
-  // interleaved at different positions.
-  const t = getBonusTasks(girl)[idx];
-  if (!t) return;
-  if (girl === "celia") STATE.celiaBonusTasks = STATE.celiaBonusTasks.filter(x => x.id !== t.id);
-  else                  STATE.kataBonusTasks  = STATE.kataBonusTasks.filter(x => x.id !== t.id);
-  saveState(); renderGirlView(girl); switchGirl(currentGirl);
-}
-
-function toggleBonus(girl, idx, el) {
-  const tasks = getBonusTasks(girl);
-  const t = tasks[idx];
-  if (!t) return;
-  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  if (done[t.id]) {
-    requestUncheck(girl, t.id, t.pts, t.name);
-    return;
-  }
-  done[t.id] = true;
-  if (girl==="celia") STATE.celiaPts += t.pts;
-  else                STATE.kataPts  += t.pts;
-  addHistory(girl==="celia"?"Celia":"Kata", "✨ Bonus: " + t.name, t.pts);
-  celebrate(el, t.pts);
-  saveState(); updateTabs(); renderGirlView(girl); switchGirl(currentGirl);
-}
-
-// ============================================================
 
 // ============================================================
 // REWARDS PAGE
@@ -3144,17 +3877,20 @@ showView("girl");
 applyGirlTint("celia"); // show Celia photo on first load
 
 // Modal backdrop close
-["avatar-modal","deposit-modal","redeem-modal","reset-modal"].forEach(id => {
+["avatar-modal","deposit-modal","redeem-modal","reset-modal","pin-modal","class-modal"].forEach(id => {
   document.getElementById(id).addEventListener("click", function(e) {
     if (e.target === this) {
       if (id==="avatar-modal") closeAvatarModal();
       else if (id==="deposit-modal") closeDepositModal();
       else if (id==="redeem-modal") closeRedeemModal();
+      else if (id==="pin-modal") closeParentPinModal();
+      else if (id==="class-modal") closeClassModal();
       else this.classList.remove("open");
     }
   });
 });
 window.addEventListener("resize",()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+updateUnlockBanner();
 
 // ── SERVICE WORKER REGISTRATION ──────────────────────────────
 // Only register SW on real deployed domain, not preview/dev environments
