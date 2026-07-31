@@ -30,7 +30,7 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 #bg {
   position: fixed; inset: 0; z-index: 0;
   background-size: cover; background-position: center; background-repeat: no-repeat;
-  transition: background-image 0.8s ease;
+  transition: background-image 0.8s ease, opacity 0.3s ease;
 }
 #bg::after {
   content: ""; position: absolute; inset: 0;
@@ -42,6 +42,11 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   position: relative; z-index: 1;
   height: 100dvh; display: flex; flex-direction: column;
   max-width: 520px; margin: 0 auto; overflow: hidden;
+}
+/* The family iPad lives in a landscape-only case — use the extra width
+   instead of centering a phone-width column on a tablet screen. */
+@media (orientation: landscape) and (min-width: 700px) {
+  #app { max-width: 1000px; }
 }
 
 /* TABS */
@@ -934,6 +939,11 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   border: 2px solid rgba(255,215,0,0.3); border-radius: 14px;
   background: rgba(255,215,0,0.1); color: #fff;
   font-weight: 700; font-size: 0.9rem;
+}
+.day-event-time { font-size: 0.78rem; font-weight: 800; color: rgba(255,215,0,0.85); white-space: nowrap; }
+.cal-class-dot {
+  position: absolute; top: 3px; left: 4px;
+  width: 5px; height: 5px; border-radius: 50%; background: #ffe066;
 }
 .day-detail-empty {
   font-size: 0.8rem; color: rgba(255,255,255,0.45); font-weight: 600;
@@ -2046,8 +2056,11 @@ function buildMonthCalendarHTML(girl) {
     if (!inMonth) cellClasses.push("other-month");
     if (isToday) cellClasses.push("is-today");
 
+    const classDotHTML = getClassesForDate(girl, dKey).length ? `<span class="cal-class-dot"></span>` : "";
+
     cellsHTML += `<button class="${cellClasses.join(" ")}" onclick="openDayDetail('${girl}','${dKey}')">
       <span class="cal-day-num">${d.getDate()}</span>
+      ${classDotHTML}
       ${barOrStarHTML}
       ${ptsHTML}
     </button>`;
@@ -2092,11 +2105,20 @@ function buildDayDetailHTML(girl, dateKey) {
     </div>
   </div>`;
 
-  // Classes/events — Phase 3 populates real classes; kid-added events show here now.
+  // Classes (fixed weekly schedule) + kid-added events, timed classes first
+  // sorted by start time, untimed kid events last.
+  const classesToday = getClassesForDate(girl, dateKey);
   const kidEvents = kidItems.filter(t => t.kind === "event");
   html += `<div class="day-detail-events-section">
     <div class="cat-label">🎈 Classes &amp; Events</div>`;
-  if (kidEvents.length) {
+  if (classesToday.length || kidEvents.length) {
+    classesToday.forEach(c => {
+      const timeLabel = c.endTime ? `${c.time} – ${c.endTime}` : c.time;
+      html += `<div class="day-event-row">
+        <span class="task-name">${escapeHtml(c.name)}</span>
+        <span class="day-event-time">${escapeHtml(timeLabel)}</span>
+      </div>`;
+    });
     kidEvents.forEach(t => {
       html += `<div class="day-event-row">
         <span class="task-name">${escapeHtml(t.name)}</span>
@@ -2332,6 +2354,20 @@ function switchGirl(girl) {
   if (girl==="mama") renderMamaView();
   // Per-girl background tint overlay
   applyGirlTint(girl);
+  updateBgVisibility();
+}
+
+// The month calendar grid is already busy (week tints, progress bars/stars,
+// class dots) — the decorative seasonal background + girl tint fight it, so
+// hide the background specifically while the calendar grid (not day-detail)
+// is showing. Restored for every other view.
+function updateBgVisibility() {
+  const bgEl = document.getElementById("bg");
+  if (!bgEl) return;
+  const isCalendarGrid = currentView === "girl"
+    && (currentGirl === "celia" || currentGirl === "kata")
+    && calendarState[currentGirl].mode === "month";
+  bgEl.style.opacity = isCalendarGrid ? "0" : "1";
 }
 
 
@@ -2397,6 +2433,11 @@ function showView(view) {
   if (view==="rewards")   document.getElementById("nav-rewards").classList.add("active");
   if (view==="dashboard") document.getElementById("nav-dash").classList.add("active");
   if (view==="settings")  document.getElementById("nav-settings").classList.add("active");
+
+  // showView('girl') is always immediately followed by switchGirl(...) at
+  // each call site, which owns visibility for that case — but dashboard/
+  // settings/rewards have no such follow-up call, so handle it here too.
+  if (view !== "girl") updateBgVisibility();
 }
 
 // ============================================================
@@ -2715,6 +2756,21 @@ const DAILY_CHORES = {
 };
 
 const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+// ============================================================
+// WEEKLY CLASSES — fixed recurring schedule, same hardcoded pattern as
+// DAILY_CHORES above. A full parent-editable STATE.classes list (one-off
+// events, add/edit/delete UI) is a bigger future update if that's wanted;
+// this covers "these classes happen every week" for now.
+// ============================================================
+const WEEKLY_CLASSES = [
+  { id: "class_coop",  name: "Co-op",          girl: "both", daysOfWeek: [4], time: "9:00 AM",  endTime: "3:45 PM" },
+  { id: "class_music", name: "Music Lessons",  girl: "both", daysOfWeek: [1], time: "5:00 PM",  endTime: null },
+];
+function getClassesForDate(girl, dateKey) {
+  const dow = parseDateKey(dateKey).getDay();
+  return WEEKLY_CLASSES.filter(c => (c.girl === "both" || c.girl === girl) && c.daysOfWeek.includes(dow));
+}
 
 // Real day-of-week, unless a demo override is active (see loadDemoData()) —
 // only affects which rotating chore/focus displays, never actual reset timing
