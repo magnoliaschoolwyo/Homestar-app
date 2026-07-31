@@ -838,6 +838,131 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 .tab-btn[data-girl="celia"].active { background: rgba(255,182,193,0.35); border-color: rgba(255,182,193,0.6); }
 .tab-btn[data-girl="kata"].active  { background: rgba(147,197,253,0.35); border-color: rgba(147,197,253,0.6); }
 
+/* ============================================================
+   CALENDAR VIEW (month grid)
+   ============================================================ */
+.cal-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.cal-nav-btn {
+  width: 36px; height: 36px; border-radius: 12px; border: none;
+  background: rgba(255,255,255,0.16); color: #fff;
+  font-size: 1.2rem; font-weight: 800; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.cal-nav-btn:active { background: rgba(255,255,255,0.3); }
+.cal-month-label {
+  flex: 1; text-align: center;
+  font-family: "Fredoka One", cursive; font-size: 1.15rem; color: #fff;
+}
+.cal-today-btn {
+  padding: 8px 12px; border-radius: 12px; border: none;
+  background: rgba(255,255,255,0.16); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.78rem;
+  cursor: pointer; flex-shrink: 0;
+}
+.cal-today-btn:active { background: rgba(255,255,255,0.3); }
+.cal-legend {
+  display: flex; gap: 14px; justify-content: center;
+  margin-bottom: 10px; font-size: 0.72rem; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+.cal-legend-item { display: flex; align-items: center; gap: 5px; }
+.cal-legend-swatch { width: 12px; height: 12px; border-radius: 4px; }
+.cal-legend-swatch.wk-a { background: rgba(255,159,205,0.55); }
+.cal-legend-swatch.wk-b { background: rgba(94,224,208,0.55); }
+.cal-dow-row {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+  margin-bottom: 4px;
+}
+.cal-dow {
+  text-align: center; font-size: 0.68rem; font-weight: 800;
+  color: rgba(255,255,255,0.45);
+}
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+  margin-bottom: 18px;
+}
+.cal-cell {
+  aspect-ratio: 1; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 4px 2px 3px; position: relative; cursor: pointer;
+  color: #fff; font-family: "Nunito", sans-serif;
+  transition: transform 0.12s;
+}
+.cal-cell:active { transform: scale(0.94); }
+.cal-cell.wk-a { background: rgba(255,159,205,0.16); border-color: rgba(255,159,205,0.3); }
+.cal-cell.wk-b { background: rgba(94,224,208,0.16); border-color: rgba(94,224,208,0.3); }
+.cal-cell.other-month { opacity: 0.35; }
+.cal-cell.is-today { border-color: rgba(255,215,0,0.85); border-width: 2px; }
+.cal-day-num { font-size: 0.78rem; font-weight: 800; }
+.cal-progress-track {
+  width: 80%; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,0.2); overflow: hidden;
+  margin-top: auto; margin-bottom: 2px;
+}
+.cal-progress-fill { height: 100%; background: #22c55e; border-radius: 4px; }
+.cal-star { margin-top: auto; margin-bottom: 1px; font-size: 0.85rem; }
+.cal-pts-corner {
+  position: absolute; top: 2px; right: 3px;
+  font-size: 0.55rem; font-weight: 800; color: rgba(255,215,0,0.9);
+}
+
+/* ============================================================
+   DAY DETAIL VIEW
+   ============================================================ */
+.day-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 10px;
+}
+.day-detail-back {
+  padding: 8px 14px; border-radius: 12px; border: none;
+  background: rgba(255,255,255,0.16); color: #fff;
+  font-family: "Fredoka One", cursive; font-size: 0.85rem; cursor: pointer;
+  flex-shrink: 0;
+}
+.day-detail-back:active { background: rgba(255,255,255,0.3); }
+.day-detail-date { text-align: right; }
+.day-detail-date-main { font-family: "Fredoka One", cursive; font-size: 0.95rem; color: #fff; }
+.day-detail-week-badge { font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.day-detail-events-section { margin-bottom: 18px; }
+.day-event-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; margin-bottom: 6px;
+  border: 2px solid rgba(255,215,0,0.3); border-radius: 14px;
+  background: rgba(255,215,0,0.1); color: #fff;
+  font-weight: 700; font-size: 0.9rem;
+}
+.day-detail-empty {
+  font-size: 0.8rem; color: rgba(255,255,255,0.45); font-weight: 600;
+  padding: 6px 2px;
+}
+.task-btn.locked { opacity: 0.6; cursor: not-allowed; }
+.bonus-task-btn.locked { cursor: not-allowed; }
+
+/* Kid-added tasks/events — visually distinct from graded categories, zero points */
+.kid-item-section { margin-bottom: 18px; }
+.kid-item-row {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px; margin-bottom: 8px;
+  border: 2px dashed rgba(255,255,255,0.3); border-radius: 16px;
+  background: rgba(255,255,255,0.07);
+  cursor: pointer; color: #fff;
+  font-family: "Nunito", sans-serif; font-size: 0.95rem; font-weight: 700;
+}
+.kid-item-row.done { opacity: 0.55; text-decoration: line-through; }
+.kid-item-row .check-circle { border-color: rgba(255,255,255,0.4); }
+.kid-item-row.done .check-circle { background: rgba(34,197,94,0.7); border-color: #22c55e; }
+.kid-item-row .task-name { flex: 1; }
+.kid-item-add-form { display: flex; gap: 8px; align-items: stretch; margin-top: 4px; }
+.kid-item-kind-select {
+  padding: 0 10px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-family: "Nunito", sans-serif; font-weight: 700; font-size: 0.85rem;
+}
+
 </style>
 </head>
 <body>
@@ -1785,6 +1910,335 @@ function getNextWeekFlipLabel() {
 }
 
 // ============================================================
+// CALENDAR — date-key helpers
+// New date-keyed fields introduced by the calendar feature use ISO
+// "YYYY-MM-DD" (built from local y/m/d, not toISOString()/UTC, so the key
+// never shifts near midnight). This deliberately differs from lastReset's
+// toDateString() format — see the Phase 1 report for why.
+// ============================================================
+function toDateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function parseDateKey(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function todayKey() { return toDateKey(new Date()); }
+
+// Pure function: which chore week ("A"/"B") a given date falls in, past or
+// future. Derived from STATE.weekPeriodStart/STATE.week (kept in sync by
+// checkWeekAutoFlip on every load) by counting whole Sun–Sat periods between
+// the anchor and the target date, flipping parity on an odd count.
+function weekForDate(dateKey) {
+  const target = parseDateKey(dateKey);
+  const targetPeriodStart = new Date(target);
+  targetPeriodStart.setDate(targetPeriodStart.getDate() - targetPeriodStart.getDay());
+  const anchor = new Date(STATE.weekPeriodStart || getWeekPeriodStart(new Date()));
+  anchor.setHours(0, 0, 0, 0);
+  targetPeriodStart.setHours(0, 0, 0, 0);
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const diffWeeks = Math.round((targetPeriodStart - anchor) / msPerWeek);
+  const flip = ((diffWeeks % 2) + 2) % 2; // normalize negative mod for past dates
+  if (flip === 0) return STATE.week;
+  return STATE.week === "A" ? "B" : "A";
+}
+
+// Week-appropriate base tasks for a girl on an arbitrary date (Phase 1 uses
+// this in the day-detail view instead of the today-only getTasksForGirl()).
+function getTasksForGirlOnDate(girl, dateKey) {
+  const wk = weekForDate(dateKey);
+  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA).filter(t => !t.week || t.week === wk);
+}
+
+// Rotating Mon–Fri chore for an arbitrary date (getTodayChores() is today/demo-only).
+function getChoresForDate(dateKey) {
+  const day = parseDateKey(dateKey).getDay();
+  return DAILY_CHORES[day] || [];
+}
+
+// ============================================================
+// CALENDAR — per-girl view state (in-memory only, not persisted —
+// each tab simply lands on the current month on open)
+// ============================================================
+const calendarState = {
+  celia: { mode: "month", year: null, month: null, selectedDate: null },
+  kata:  { mode: "month", year: null, month: null, selectedDate: null },
+};
+function ensureCalendarState(girl) {
+  const cs = calendarState[girl];
+  if (cs.year === null) {
+    const now = new Date();
+    cs.year = now.getFullYear();
+    cs.month = now.getMonth();
+    cs.selectedDate = toDateKey(now);
+  }
+}
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function calendarShiftMonth(girl, delta) {
+  const cs = calendarState[girl];
+  let m = cs.month + delta, y = cs.year;
+  if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+  cs.month = m; cs.year = y;
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+function calendarGoToday(girl) {
+  const now = new Date();
+  calendarState[girl].year = now.getFullYear();
+  calendarState[girl].month = now.getMonth();
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+function openDayDetail(girl, dateKey) {
+  calendarState[girl].mode = "day";
+  calendarState[girl].selectedDate = dateKey;
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+function backToCalendar(girl) {
+  calendarState[girl].mode = "month";
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+
+function buildMonthCalendarHTML(girl) {
+  const cs = calendarState[girl];
+  const year = cs.year, month = cs.month;
+  const firstOfMonth = new Date(year, month, 1);
+  const startDow = firstOfMonth.getDay();
+  const gridStart = new Date(year, month, 1 - startDow);
+  const todK = todayKey();
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+
+  let cellsHTML = "";
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
+    const dKey = toDateKey(d);
+    const inMonth = d.getMonth() === month;
+    const isToday = dKey === todK;
+    const wk = weekForDate(dKey);
+    const dow = d.getDay();
+    const isWeekend = dow === 0 || dow === 6;
+
+    // Phase 1 only has real completion data for today — see report; other
+    // days intentionally show neither bar nor star rather than a fake 0%.
+    let barOrStarHTML = "";
+    let ptsHTML = "";
+    if (isToday) {
+      const allT = [...getTasksForGirlOnDate(girl, dKey), ...getChoresForDate(dKey), ...getBonusTasks(girl)];
+      const totalCount = allT.length;
+      const doneCount = allT.filter(t => done[t.id]).length;
+      const pct = totalCount ? Math.round(doneCount / totalCount * 100) : 0;
+      if (totalCount > 0) {
+        barOrStarHTML = (pct >= 100 && !isWeekend)
+          ? `<div class="cal-star">⭐</div>`
+          : `<div class="cal-progress-track"><div class="cal-progress-fill" style="width:${pct}%"></div></div>`;
+      }
+      const who = girl === "celia" ? "Celia" : "Kata";
+      const todayStr = new Date().toDateString();
+      const earnedToday = STATE.history
+        .filter(h => h.date === todayStr && h.who === who && h.pts > 0)
+        .reduce((s, h) => s + h.pts, 0);
+      if (earnedToday > 0) ptsHTML = `<div class="cal-pts-corner">+${earnedToday}</div>`;
+    }
+
+    const cellClasses = ["cal-cell", "wk-" + wk.toLowerCase()];
+    if (!inMonth) cellClasses.push("other-month");
+    if (isToday) cellClasses.push("is-today");
+
+    cellsHTML += `<button class="${cellClasses.join(" ")}" onclick="openDayDetail('${girl}','${dKey}')">
+      <span class="cal-day-num">${d.getDate()}</span>
+      ${barOrStarHTML}
+      ${ptsHTML}
+    </button>`;
+  }
+
+  return `
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="calendarShiftMonth('${girl}',-1)">‹</button>
+      <div class="cal-month-label">${MONTH_NAMES[month]} ${year}</div>
+      <button class="cal-nav-btn" onclick="calendarShiftMonth('${girl}',1)">›</button>
+      <button class="cal-today-btn" onclick="calendarGoToday('${girl}')">Today</button>
+    </div>
+    <div class="cal-legend">
+      <span class="cal-legend-item"><span class="cal-legend-swatch wk-a"></span>Week A</span>
+      <span class="cal-legend-item"><span class="cal-legend-swatch wk-b"></span>Week B</span>
+    </div>
+    <div class="cal-dow-row">${["Su","Mo","Tu","We","Th","Fr","Sa"].map(l => `<div class="cal-dow">${l}</div>`).join("")}</div>
+    <div class="cal-grid">${cellsHTML}</div>
+  `;
+}
+
+function buildDayDetailHTML(girl, dateKey) {
+  const d = parseDateKey(dateKey);
+  const todK = todayKey();
+  const isToday = dateKey === todK;
+  const isFuture = dateKey > todK;
+  const editable = isToday; // Phase 2 adds PIN-gated editing for past dates
+
+  const wk = weekForDate(dateKey);
+  const dateLabel = d.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  const tasks = getTasksForGirlOnDate(girl, dateKey);
+  const chores = getChoresForDate(dateKey);
+  const legacyBonus = getBonusTasks(girl);
+  const kidItems = getKidItemsForDate(girl, dateKey);
+
+  let html = `<div class="day-detail-header">
+    <button class="day-detail-back" onclick="backToCalendar('${girl}')">‹ Calendar</button>
+    <div class="day-detail-date">
+      <div class="day-detail-date-main">${dateLabel}</div>
+      <div class="day-detail-week-badge">Week ${wk}</div>
+    </div>
+  </div>`;
+
+  // Classes/events — Phase 3 populates real classes; kid-added events show here now.
+  const kidEvents = kidItems.filter(t => t.kind === "event");
+  html += `<div class="day-detail-events-section">
+    <div class="cat-label">🎈 Classes &amp; Events</div>`;
+  if (kidEvents.length) {
+    kidEvents.forEach(t => {
+      html += `<div class="day-event-row">
+        <span class="task-name">${escapeHtml(t.name)}</span>
+        ${(isToday || isFuture) ? `<button class="bonus-delete" onclick="deleteKidItem(event,'${girl}','${t.id}')">✕</button>` : ""}
+      </div>`;
+    });
+  } else {
+    html += `<div class="day-detail-empty">Nothing scheduled yet</div>`;
+  }
+  html += `</div>`;
+
+  // Rotating Mon–Fri chore banner for this date
+  if (chores.length) {
+    const choreButtons = chores.map(t => {
+      const isDone = !!done[t.id];
+      const clickAttr = editable ? `onclick="toggleTask('${girl}','${t.id}',${t.pts},this)"` : "";
+      return `<button class="task-btn chores ${isDone?"done":""} ${!editable?"locked":""}" ${clickAttr} ${!editable?"disabled":""}>
+        <span class="check-circle">${isDone?"✓":(!editable?"🔒":"")}</span>
+        <span class="task-name">${t.name}</span>
+        <span class="task-pts-badge">+${t.pts} ⭐</span>
+      </button>`;
+    }).join("");
+    html += `<div class="daily-chore-section">
+      <div class="daily-chore-banner">
+        <div class="daily-chore-header">
+          <span class="daily-chore-day">📅 ${DAY_NAMES[d.getDay()]}</span>
+          <span class="daily-chore-title">Special Chore${chores.length>1?"s":""}</span>
+        </div>
+        ${choreButtons}
+      </div>
+    </div>`;
+  }
+
+  // Week-appropriate base tasks, grouped by category
+  ["chores","academic","exercise","music"].forEach(cat => {
+    const catTasks = tasks.filter(t => t.cat === cat);
+    if (!catTasks.length) return;
+    const cc = CAT_COLORS[cat];
+    html += `<div class="cat-section">
+      <div class="cat-label"><span class="cat-dot" style="background:${cc.dot}"></span>${cc.label}</div>`;
+    catTasks.forEach(t => {
+      const isDone = !!done[t.id];
+      const clickAttr = editable ? `onclick="toggleTask('${girl}','${t.id}',${t.pts},this)"` : "";
+      html += `<button class="task-btn ${cc.cls} ${isDone?"done":""} ${!editable?"locked":""}" ${clickAttr} ${!editable?"disabled":""}>
+        <span class="check-circle">${isDone?"✓":(!editable?"🔒":"")}</span>
+        <span class="task-name">${t.name}</span>
+        <span class="task-pts-badge">+${t.pts} ⭐</span>
+      </button>`;
+    });
+    html += `</div>`;
+  });
+
+  // Existing (points-bearing, mom-added) bonus tasks — unchanged mechanism.
+  // Only today's view keeps the live add-form/checkbox/delete controls.
+  if (isToday) {
+    html += buildBonusHTML(girl);
+  } else if (legacyBonus.length) {
+    html += `<div class="bonus-section">
+      <div class="bonus-label"><span class="bonus-dot"></span>✨ Bonus Tasks</div>`;
+    legacyBonus.forEach(t => {
+      const isDone = !!done[t.id];
+      html += `<div class="bonus-task-btn locked ${isDone?"done":""}">
+        <span class="check-circle" style="border-color:rgba(236,72,153,0.5);${isDone?"background:rgba(34,197,94,0.7);border-color:#22c55e":""}">${isDone?"✓":"🔒"}</span>
+        <span class="task-name">${escapeHtml(t.name)}</span>
+        <span class="task-pts-badge" style="background:rgba(236,72,153,0.25)">+${t.pts} ⭐</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Kid-added tasks (always worth 0 pts, never touch the completion bar/star)
+  const kidTasks = kidItems.filter(t => t.kind === "task");
+  html += `<div class="kid-item-section">
+    <div class="cat-label">🖍️ ${girl==="celia"?"Celia's":"Kata's"} Added Items</div>`;
+  kidTasks.forEach(t => {
+    const isDone = !!done[t.id];
+    html += `<div class="kid-item-row ${isDone?"done":""}" onclick="toggleKidItemTask('${girl}','${t.id}')">
+      <span class="check-circle">${isDone?"✓":""}</span>
+      <span class="task-name">${escapeHtml(t.name)}</span>
+      <button class="bonus-delete" onclick="deleteKidItem(event,'${girl}','${t.id}')">✕</button>
+    </div>`;
+  });
+  if (!kidTasks.length && !kidEvents.length) {
+    html += `<div class="day-detail-empty">Nothing added yet</div>`;
+  }
+  if (isToday || isFuture) {
+    html += `<div class="kid-item-add-form">
+      <input class="bonus-task-input" id="kid-item-name-${girl}" type="text" placeholder="Add a task or event…" maxlength="60">
+      <select class="kid-item-kind-select" id="kid-item-kind-${girl}">
+        <option value="task">Task</option>
+        <option value="event">Event</option>
+      </select>
+      <button class="bonus-add-btn" onclick="addKidItem('${girl}','${dateKey}')">+ Add</button>
+    </div>`;
+  } else {
+    html += `<div class="day-detail-empty">🔒 Editing past days needs a parent code — coming in a future update</div>`;
+  }
+  html += `</div>`;
+
+  return html;
+}
+
+// ============================================================
+// KID-ADDED ITEMS (tasks/events) — extends the existing bonus-task arrays
+// with optional kind/date/pts:0 fields. Items without a `date` are the
+// original mom-added, points-bearing bonus tasks and are unaffected.
+// ============================================================
+function getRawBonusTasks(girl) {
+  return girl === "celia" ? (STATE.celiaBonusTasks || []) : (STATE.kataBonusTasks || []);
+}
+function getKidItemsForDate(girl, dateKey) {
+  return getRawBonusTasks(girl).filter(t => t.date === dateKey);
+}
+function addKidItem(girl, dateKey) {
+  const nameEl = document.getElementById(`kid-item-name-${girl}`);
+  const kindEl = document.getElementById(`kid-item-kind-${girl}`);
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  const kind = kindEl.value === "event" ? "event" : "task";
+  const id = "kiditem_" + girl + "_" + Date.now();
+  const item = { id, name, kind, date: dateKey, pts: 0 };
+  if (girl === "celia") { STATE.celiaBonusTasks = STATE.celiaBonusTasks || []; STATE.celiaBonusTasks.push(item); }
+  else                  { STATE.kataBonusTasks  = STATE.kataBonusTasks  || []; STATE.kataBonusTasks.push(item); }
+  saveState();
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+function deleteKidItem(e, girl, id) {
+  e.stopPropagation();
+  if (girl === "celia") STATE.celiaBonusTasks = (STATE.celiaBonusTasks || []).filter(t => t.id !== id);
+  else                  STATE.kataBonusTasks  = (STATE.kataBonusTasks  || []).filter(t => t.id !== id);
+  saveState();
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+// Kid tasks are worth 0 pts: no confirmation, no points/history side effects.
+function toggleKidItemTask(girl, id) {
+  const done = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
+  done[id] = !done[id];
+  saveState();
+  renderGirlView(girl); switchGirl(currentGirl);
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 // Escapes text for safe use as HTML content (e.g. inside a <span>).
@@ -1816,67 +2270,38 @@ function getSavings(girl) {
 // ============================================================
 // RENDER
 // ============================================================
+// Landing view for Celia/Kata is now the month calendar, drilling into a
+// per-date detail view (see buildMonthCalendarHTML / buildDayDetailHTML).
+// The flat today-only checklist this used to render directly is gone —
+// today's experience now lives inside the day-detail view for todayKey(),
+// reusing the exact same toggleTask/requestUncheck/celebrate/addHistory
+// calls so it behaves identically to before.
 function renderGirlView(girl) {
-  const el    = document.getElementById(girl + "-view");
-  const done  = girl === "celia" ? STATE.celiaDone : STATE.kataDone;
-  const pts   = girl === "celia" ? STATE.celiaPts  : STATE.kataPts;
-  const name  = girl === "celia" ? "Celia" : "Kataleyah";
-  const avatar= girl === "celia" ? STATE.celiaAvatar : girl === "kata" ? STATE.kataAvatar : STATE.mamaAvatar;
-  const tasks   = getTasksForGirl(girl);
-  const rewards = getRewardsForGirl(girl);
-  const savings = getSavings(girl);
+  const el  = document.getElementById(girl + "-view");
+  const pts = girl === "celia" ? STATE.celiaPts : STATE.kataPts;
+  const name = girl === "celia" ? "Celia" : "Kataleyah";
 
-  const dailyChores = getTodayChores();
-  const bonusTasks  = getBonusTasks(girl);
-  const allTasks    = [...tasks, ...dailyChores, ...bonusTasks];
-  const totalTasks  = allTasks.length;
-  const doneTasks   = allTasks.filter(t => done[t.id]).length;
-
-  // Daily rotating chore banner
-  let taskHTML = buildDailyChoreHTML(girl);
-
-  // Bonus tasks
-  taskHTML += buildBonusHTML(girl);
-
-  // Standard tasks by category
-  taskHTML += "";
-  ["chores","academic","exercise","music"].forEach(cat => {
-    const catTasks = tasks.filter(t => t.cat === cat);
-    if (!catTasks.length) return;
-    const cc = CAT_COLORS[cat];
-    taskHTML += `<div class="cat-section">
-      <div class="cat-label"><span class="cat-dot" style="background:${cc.dot}"></span>${cc.label}</div>`;
-    catTasks.forEach(t => {
-      const isDone = !!done[t.id];
-      taskHTML += `<button class="task-btn ${cc.cls} ${isDone?"done":""}" onclick="toggleTask('${girl}','${t.id}',${t.pts},this)">
-        <span class="check-circle">${isDone?"✓":""}</span>
-        <span class="task-name">${t.name}</span>
-        <span class="task-pts-badge">+${t.pts} ⭐</span>
-      </button>`;
-    });
-    taskHTML += `</div>`;
-  });
-
-    // Rewards moved to dedicated Rewards tab
-  const rewardsHTML = "";
+  ensureCalendarState(girl);
+  const cs = calendarState[girl];
+  const bodyHTML = cs.mode === "day"
+    ? buildDayDetailHTML(girl, cs.selectedDate)
+    : buildMonthCalendarHTML(girl);
 
   el.innerHTML = `
     <div class="girl-header">
       <div class="avatar-wrap">
         <div class="avatar-circle" onclick="openAvatarModal('${girl}')">
-          ${girl === "celia" ? `<img src="celia.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` 
-          : girl === "kata"  ? `<img src="kata.jpg"  style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-          : avatar}
+          ${girl === "celia" ? `<img src="celia.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+          : `<img src="kata.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`}
         </div>
-        ${girl === "mama" ? `<div class="avatar-edit-hint">✏️</div>` : ""}
       </div>
       <div class="girl-title">
         <div class="girl-name">${name}</div>
-        <div class="girl-points">⭐ ${pts} pts available · ${doneTasks}/${totalTasks} tasks</div>
+        <div class="girl-points">⭐ ${pts} pts available</div>
       </div>
-      <div class="week-badge">Week ${STATE.week}<br>${doneTasks===totalTasks?"🌟 Done!":""}</div>
+      <div class="week-badge">Week ${STATE.week}</div>
     </div>
-    ${taskHTML}
+    ${bodyHTML}
   `;
 }
 
@@ -2351,8 +2776,11 @@ function buildDailyChoreHTML(girl) {
 // ============================================================
 // BONUS TASKS
 // ============================================================
+// Legacy, always-shown, points-bearing bonus tasks (mom-added). Date-scoped
+// kid items (added from the calendar day view) live in the same array but
+// are excluded here and shown separately — see getKidItemsForDate().
 function getBonusTasks(girl) {
-  return girl === "celia" ? (STATE.celiaBonusTasks || []) : (STATE.kataBonusTasks || []);
+  return getRawBonusTasks(girl).filter(t => !t.date);
 }
 
 function buildBonusHTML(girl) {
@@ -2404,8 +2832,14 @@ function addBonusTask(girl) {
 
 function deleteBonus(e, girl, idx) {
   e.stopPropagation();
-  if (girl === "celia") STATE.celiaBonusTasks.splice(idx, 1);
-  else                  STATE.kataBonusTasks.splice(idx, 1);
+  // idx is the index within getBonusTasks(girl) (the filtered, legacy-only
+  // list actually rendered) — look up by id rather than splicing the raw
+  // array directly, since the raw array may also hold date-scoped kid items
+  // interleaved at different positions.
+  const t = getBonusTasks(girl)[idx];
+  if (!t) return;
+  if (girl === "celia") STATE.celiaBonusTasks = STATE.celiaBonusTasks.filter(x => x.id !== t.id);
+  else                  STATE.kataBonusTasks  = STATE.kataBonusTasks.filter(x => x.id !== t.id);
   saveState(); renderGirlView(girl); switchGirl(currentGirl);
 }
 
