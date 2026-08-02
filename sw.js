@@ -1,4 +1,4 @@
-const CACHE_NAME = 'homestar-v18';
+const CACHE_NAME = 'homestar-v19';
 const ASSETS = [
   '/',
   '/index.html',

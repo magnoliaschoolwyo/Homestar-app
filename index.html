@@ -3858,18 +3858,33 @@ updateUnlockBanner();
 // ── SERVICE WORKER REGISTRATION ──────────────────────────────
 // Only register SW on real deployed domain, not preview/dev environments
 if ("serviceWorker" in navigator && location.hostname !== "www.claudeusercontent.com") {
+  let swReg = null;
+  let reloadingForUpdate = false;
+
+  // Once a new service worker takes control, reload so the fresh index.html
+  // (already fetched by the SW's own update check) actually gets displayed.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloadingForUpdate) return;
+    reloadingForUpdate = true;
+    window.location.reload();
+  });
+
   window.addEventListener("load", () => {
-    navigator.serviceWorker.getRegistrations().then(regs => {
-      // Unregister all old service workers so fresh content loads immediately
-      regs.forEach(reg => reg.unregister());
-    });
     navigator.serviceWorker.register("/sw.js")
       .then(reg => {
-        reg.update(); // force check for new version
+        swReg = reg;
         console.log("HomeStar SW registered:", reg.scope);
       })
       .catch(err => console.log("SW not found — upload sw.js to enable offline mode."));
   });
+
+  // Installed home-screen apps (esp. iOS) often resume from the background
+  // instead of firing a fresh page load, so "load" alone isn't enough —
+  // re-check for a new version whenever the app comes back to the foreground.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && swReg) swReg.update();
+  });
+  window.addEventListener("pageshow", () => { if (swReg) swReg.update(); });
 }
 </script>
 </body>
