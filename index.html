@@ -1199,21 +1199,6 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
       <div id="classes-list"></div>
       <button class="settings-btn" onclick="openClassForm()" style="margin-top:4px;width:100%">+ Add Class or Event</button>
     </div>
-    <div class="settings-section" style="border-style:dashed;border-color:rgba(167,139,250,0.4)">
-      <div class="settings-title">🎬 Demo Mode</div>
-      <p style="font-size:0.8rem;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:10px;line-height:1.5">
-        Fills points, task history, reward progress, and the habit tracker with
-        realistic sample data for showing the app to others — and shows Monday's
-        rotating chores/focus regardless of the real day. This overwrites what's
-        on this device. <strong>Export a backup first</strong> if you want your
-        real data back afterward — Import restores it exactly.
-      </p>
-      <div class="settings-row">
-        <span class="settings-label">Load sample data for a demo</span>
-        <button class="settings-btn" onclick="loadDemoData()">🎬 Load Demo Data</button>
-      </div>
-      <div class="cal-status" id="demo-status"></div>
-    </div>
   </div>
 </div>
 
@@ -1404,13 +1389,13 @@ const TASKS_CELIA = [
   { id:"c_liv",  name:"Living room pick-up",  pts:1, cat:"chores",   week:"B"  },
   // Academics
   { id:"c_scrip", name:"Scripture & Quiet Time w/ Jesus 📖✝️", pts:5, cat:"academic", week:null },
-  { id:"c_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
   { id:"c_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
-  { id:"c_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
-  { id:"c_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
+  // Thursdays are mostly spent at Co-op — skipDays excludes a task on
+  // that weekday (0=Sun..6=Sat) while it still runs every other day.
+  { id:"c_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null, skipDays:[4] },
   // Exercise
-  { id:"c_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null },
-  { id:"c_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null },
+  { id:"c_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null, skipDays:[4] },
+  { id:"c_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null, skipDays:[4] },
   // Music
   { id:"c_music",name:"Music practice 🎵",    pts:4, cat:"music",    week:null },
 ];
@@ -1426,12 +1411,10 @@ const TASKS_KATA = [
   { id:"k_eggs", name:"Collect eggs 🥚",      pts:1, cat:"chores",   week:"B"  },
   { id:"k_comp", name:"Compost ♻️",           pts:1, cat:"chores",   week:"B"  },
   { id:"k_scrip", name:"Scripture & Quiet Time w/ Jesus 📖✝️", pts:5, cat:"academic", week:null },
-  { id:"k_math", name:"Math 🔢",              pts:3, cat:"academic", week:null },
   { id:"k_read", name:"Read 20 min 📚",       pts:3, cat:"academic", week:null },
-  { id:"k_gram", name:"Grammar ✏️",           pts:1, cat:"academic", week:null },
-  { id:"k_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null },
-  { id:"k_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null },
-  { id:"k_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null },
+  { id:"k_hist", name:"History/Science w/ Mom 🔬", pts:2, cat:"academic", week:null, skipDays:[4] },
+  { id:"k_exer", name:"20 min exercise 💪",   pts:4, cat:"exercise", week:null, skipDays:[4] },
+  { id:"k_out",  name:"20 min outside play 🌳",pts:1,cat:"exercise", week:null, skipDays:[4] },
   { id:"k_music",name:"Music practice 🎵",    pts:4, cat:"music",    week:null },
 ];
 
@@ -1844,93 +1827,6 @@ function setBackupStatus(msg) {
   if (el) el.textContent = msg;
 }
 
-// ============================================================
-// DEMO MODE (presentation seed data — see CLAUDE.md)
-// ============================================================
-function setDemoStatus(msg) {
-  const el = document.getElementById("demo-status");
-  if (el) el.textContent = msg;
-}
-
-function loadDemoData() {
-  const ok = confirm(
-    "Load demo data for a presentation?\n\n" +
-    "This overwrites points, task history, and reward progress currently on " +
-    "this device with realistic sample data. Export a backup first if you " +
-    "want your real data back afterward — Import restores it exactly. Continue?"
-  );
-  if (!ok) return;
-
-  const today = new Date();
-  const dayStr = d => d.toDateString();
-  const daysAgo = n => { const d = new Date(today); d.setDate(d.getDate() - n); return d; };
-
-  // Points + today's tasks — some left unchecked on purpose so a task can be
-  // checked off live during the presentation to show the celebration/confetti.
-  STATE.celiaPts = 142;
-  STATE.kataPts  = 205;
-  STATE.celiaDone = { c_dish:true, c_hyg:true, c_bed:true, c_scrip:true, c_math:true, c_read:true };
-  STATE.kataDone  = { k_dish:true, k_hyg:true, k_bed:true, k_scrip:true, k_read:true, k_music:true };
-
-  // Recent Activity feed (Dashboard) — newest first
-  STATE.history = [
-    { who:"Kata",  task:"Music practice 🎵",                pts:4,  time:"8:10 AM", date: dayStr(today) },
-    { who:"Celia", task:"Read 20 min 📚",                    pts:3,  time:"7:52 AM", date: dayStr(today) },
-    { who:"Celia", task:"Math 🔢",                           pts:3,  time:"7:40 AM", date: dayStr(today) },
-    { who:"Kata",  task:"🏆 Redeemed: Movie night pick",     pts:0,  time:"6:15 PM", date: dayStr(daysAgo(1)) },
-    { who:"Celia", task:"💰 Saved 20 toward JACZ Ice cream", pts:-20, time:"5:40 PM", date: dayStr(daysAgo(1)) },
-    { who:"Kata",  task:"20 min exercise 💪",                pts:4,  time:"4:22 PM", date: dayStr(daysAgo(1)) },
-    { who:"Celia", task:"Music practice 🎵",                 pts:4,  time:"3:58 PM", date: dayStr(daysAgo(2)) },
-    { who:"Kata",  task:"Grammar ✏️",                        pts:1,  time:"9:05 AM", date: dayStr(daysAgo(2)) },
-    { who:"Celia", task:"Collect eggs 🥚",                   pts:1,  time:"8:30 AM", date: dayStr(daysAgo(3)) },
-    { who:"Kata",  task:"History/Science w/ Mom 🔬",         pts:2,  time:"2:15 PM", date: dayStr(daysAgo(3)) },
-  ];
-
-  // Reward progress — one ready to redeem per girl, one partway there
-  STATE.celiaSavings = { r_icecream: 100, r_hike: 60 };
-  STATE.kataSavings  = { rk_movie: 50, r_dessert: 40 };
-
-  // Example bonus task + custom reward, so those features aren't empty
-  STATE.celiaBonusTasks = [{ id:"bonus_demo_c1", name:"Helped make dinner", pts:3 }];
-  STATE.kataBonusTasks  = [{ id:"bonus_demo_k1", name:"Practiced piano extra", pts:2 }];
-  STATE.customRewards   = [{ id:"custom_demo1", icon:"🎨", name:"Art supplies", pts:80 }];
-
-  // Mama: realistic (not perfect) 7-day habit history + today partially checked
-  const allIds = [...MAMA_MORNING_TASKS.map(t=>t.id), ...MAMA_DAILY_TASKS.map(t=>t.id), "m_weekly"];
-  const pattern = {
-    6: [1,1,1,1,1,1, 1,1,1,0,1,1, 1],
-    5: [1,1,0,1,1,1, 1,1,1,1,0,1, 1],
-    4: [1,1,1,1,1,0, 1,0,1,1,1,1, 1],
-    3: [1,1,1,1,1,1, 1,1,0,1,1,1, 0],
-    2: [1,0,1,1,1,1, 1,1,1,1,1,0, 1],
-    1: [1,1,1,1,1,1, 1,1,1,1,1,1, 1],
-  };
-  STATE.mamaHistory = [];
-  Object.keys(pattern).forEach(n => {
-    const d = dayStr(daysAgo(Number(n)));
-    pattern[n].forEach((wasDone, i) => {
-      STATE.mamaHistory.push({ date: d, taskId: allIds[i], done: !!wasDone });
-    });
-  });
-  STATE.mamaDone = {
-    m_nophone:true, m_hygiene:true, m_vitamins:true, m_bible:true, m_walk:true, m_intention:true,
-    m_lesson:true, m_dishes:true
-    // m_bed, m_laundry, m_connect, m_gratitude, m_weekly left open for a live demo
-  };
-  STATE.mamaIntention = "Stay patient and present during school time today.";
-  STATE.mamaIntentionDate = dayStr(today);
-  STATE.mamaResetWeek = 3;
-
-  // Show Monday's rotating chore banner + weekly focus, regardless of the real day
-  STATE.demoDayOverride = 1;
-
-  saveState();
-  renderAll();
-  switchGirl(currentGirl);
-  applyBg();
-  setDemoStatus("✅ Demo data loaded. Import your real backup afterward to restore this device.");
-}
-
 // Must be declared before applyStateDefaults() runs (top of script) since
 // it calls buildBookStudyAssignments(), which depends on this — const
 // declarations aren't hoisted the way function declarations are, so this
@@ -2114,7 +2010,7 @@ function confirmUncheck() {
   const { girl, id, pts, source, dateKey } = uncheckPending;
   if (!isDateEditable(dateKey)) { closeUncheckModal(); return; }
   if (source === "assignment") {
-    const a = STATE.assignments.find(x => x.id === id);
+    const a = findAssignmentById(id);
     const dayMap = a && STATE.assignmentDoneByDate[girl] && STATE.assignmentDoneByDate[girl][a.date];
     if (dayMap) dayMap[id] = false;
   } else {
@@ -2250,9 +2146,13 @@ function weekForDate(dateKey) {
 
 // Week-appropriate base tasks for a girl on an arbitrary date (Phase 1 uses
 // this in the day-detail view instead of the today-only getTasksForGirl()).
+// skipDays (e.g. Thursdays, mostly spent at Co-op) excludes a task on
+// specific weekdays while it still runs every other day.
 function getTasksForGirlOnDate(girl, dateKey) {
   const wk = weekForDate(dateKey);
-  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA).filter(t => !t.week || t.week === wk);
+  const dow = parseDateKey(dateKey).getDay();
+  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA)
+    .filter(t => (!t.week || t.week === wk) && (!t.skipDays || !t.skipDays.includes(dow)));
 }
 
 // Rotating Mon–Fri chore for an arbitrary date (getTodayChores() is today/demo-only).
@@ -2601,7 +2501,9 @@ function jsAttr(str) {
   return escapeHtml(JSON.stringify(String(str)));
 }
 function getTasksForGirl(girl) {
-  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA).filter(t => !t.week || t.week === STATE.week);
+  const dow = new Date().getDay();
+  return (girl === "celia" ? TASKS_CELIA : TASKS_KATA)
+    .filter(t => (!t.week || t.week === STATE.week) && (!t.skipDays || !t.skipDays.includes(dow)));
 }
 function getRewardsForGirl(girl) {
   const specific = girl === "celia" ? CELIA_REWARDS : KATA_REWARDS;
@@ -3107,12 +3009,25 @@ const CLASS_CATEGORIES = {
   personal:  { label: "Personal",       color: "#f472b6" },
 };
 
-// Seeded once on first run with the two classes already in place before the
+// Seeded once on first run with the classes already in place before the
 // full add/edit/delete UI existed, so they survive without re-entry.
 function buildInitialClasses() {
+  const rec = (id, name, girl, dow, time, endTime, category) =>
+    ({ id, name, girl, daysOfWeek: [dow], date: null, startDate: null, endDate: null, time, endTime: endTime || null, category });
   return [
-    { id: "class_coop",  name: "Co-op",         girl: "both", daysOfWeek: [4], date: null, startDate: null, endDate: null, time: "09:00", endTime: "15:45", category: "coop" },
-    { id: "class_music", name: "Music Lessons", girl: "both", daysOfWeek: [1], date: null, startDate: null, endDate: null, time: "17:00", endTime: null,    category: "personal" },
+    rec("class_coop",  "Co-op",         "both", 4, "09:00", "15:45", "coop"),
+    rec("class_music", "Music Lessons", "both", 1, "17:00", null,    "personal"),
+    // Braintree — Kataleyah
+    rec("class_braintree_kata_ela",        "ELA",                 "kata", 2, "09:00", "10:00", "braintree"),
+    rec("class_braintree_kata_writing",    "Writing",             "kata", 3, "09:00", "10:00", "braintree"),
+    rec("class_braintree_kata_babysit",    "Babysitter Training", "kata", 1, "11:00", null,     "braintree"),
+    rec("class_braintree_kata_crochet",    "Crochet",             "kata", 2, "13:00", null,     "braintree"),
+    rec("class_braintree_kata_disney",     "Disney Dinner",       "kata", 2, "11:00", null,     "braintree"),
+    // Braintree — Celia
+    rec("class_braintree_celia_ela",       "ELA",                 "celia", 2, "09:00", "10:00", "braintree"),
+    rec("class_braintree_celia_writing",   "Writing",             "celia", 2, "10:00", "11:00", "braintree"),
+    rec("class_braintree_celia_craftcrew", "Craft Crew",          "celia", 2, "13:00", "14:00", "braintree"),
+    rec("class_braintree_celia_entrepr",   "Entrepreneurship",    "celia", 3, "11:00", "12:00", "braintree"),
   ];
 }
 
@@ -3466,12 +3381,63 @@ function buildBookStudyAssignments() {
 // opts into this via SUBJECTS_WITH_WEEKEND_CATCHUP.
 const SUBJECTS_WITH_WEEKEND_CATCHUP = ["bookstudy"];
 
+// ============================================================
+// RECURRING SUBJECT TEMPLATES — for subjects that run indefinitely (unlike
+// Book Study's finite 4-week unit), e.g. Math. Each template repeats by
+// day-of-week forever rather than needing a dated STATE.assignments entry
+// pre-seeded for every future day. A "virtual" assignment is generated on
+// the fly for each matching date, with a deterministic id
+// (`${templateId}_${dateKey}`) so completion is tracked independently per
+// day via the same assignmentDoneByDate store, same as a dated entry.
+//
+// Math: Guide + student workpages every school day, same as always.
+// Beast Academy Online added twice a week as a supplement (not a
+// replacement, per Beast Academy's own "primary + supplement" guidance) —
+// lesson practice Wednesday, a trophy/challenge problem Friday.
+// ============================================================
+const RECURRING_SUBJECTS = [
+  { templateId: "math_guide",         subject: "math", girl: "both", name: "Guide (read the lesson)",               pts: 1, daysOfWeek: [1,2,3,4,5] },
+  { templateId: "math_pages",         subject: "math", girl: "both", name: "Student workpages (practice)",          pts: 2, daysOfWeek: [1,2,3,4,5] },
+  { templateId: "math_online_lesson", subject: "math", girl: "both", name: "Beast Academy Online — lesson practice", pts: 2, daysOfWeek: [3] },
+  { templateId: "math_online_trophy", subject: "math", girl: "both", name: "Beast Academy Online — trophy/challenge problem", pts: 2, daysOfWeek: [5] },
+];
+function getRecurringAssignmentsForDate(girl, dateKey) {
+  const dow = parseDateKey(dateKey).getDay();
+  return RECURRING_SUBJECTS
+    .filter(t => (t.girl === "both" || t.girl === girl) && t.daysOfWeek.includes(dow))
+    .map(t => ({
+      id: t.templateId + "_" + dateKey,
+      subject: t.subject, girl: t.girl, date: dateKey,
+      name: t.name, pts: t.pts, link: t.link || null, linkLabel: t.linkLabel || null,
+    }));
+}
+// Looks up an assignment by id regardless of whether it's a dated
+// STATE.assignments entry or a virtual recurring one (id format
+// `${templateId}_${dateKey}` — dateKey never contains "_", so the last
+// underscore always separates the two).
+function findAssignmentById(id) {
+  const dated = STATE.assignments.find(x => x.id === id);
+  if (dated) return dated;
+  const cut = id.lastIndexOf("_");
+  if (cut === -1) return null;
+  const templateId = id.substring(0, cut);
+  const dateKey = id.substring(cut + 1);
+  const template = RECURRING_SUBJECTS.find(t => t.templateId === templateId);
+  if (!template) return null;
+  return {
+    id, subject: template.subject, girl: template.girl, date: dateKey,
+    name: template.name, pts: template.pts, link: template.link || null, linkLabel: template.linkLabel || null,
+  };
+}
+
 // Assignments actually scheduled/visible for a date: items literally dated
-// that day, plus — on a Saturday, for catch-up subjects — any Mon-Fri item
+// that day (Book Study) plus recurring template items for that weekday
+// (Math), plus — on a Saturday, for catch-up subjects — any Mon-Fri item
 // from that same week still unfinished, so a girl always sees today's real
 // work-list, not just what's nominally "assigned" to today.
 function getAssignmentsForDate(girl, dateKey) {
   let items = STATE.assignments.filter(a => (a.girl === "both" || a.girl === girl) && a.date === dateKey);
+  items = items.concat(getRecurringAssignmentsForDate(girl, dateKey));
 
   const d = parseDateKey(dateKey);
   if (d.getDay() === 6) { // Saturday — check Mon-Fri of this same week for stragglers
@@ -3501,7 +3467,7 @@ function getAssignmentSubjectsForDate(girl, dateKey) {
   return bySubject;
 }
 
-const SUBJECT_LABELS = { bookstudy: "📖 Book Study" };
+const SUBJECT_LABELS = { bookstudy: "📖 Book Study", math: "🧮 Math" };
 
 function isAssignmentDone(girl, a) {
   const dayMap = ((STATE.assignmentDoneByDate[girl] || {})[a.date]) || {};
@@ -3522,7 +3488,7 @@ function isAssignmentDone(girl, a) {
 // makes a rolled-over Friday item interactive, even though Friday itself
 // is now in the past.
 function toggleAssignment(girl, assignmentId, btn, viewedDateKey) {
-  const a = STATE.assignments.find(x => x.id === assignmentId);
+  const a = findAssignmentById(assignmentId);
   if (!a) return;
   viewedDateKey = viewedDateKey || todayKey();
   if (!isDateEditable(viewedDateKey)) return;
@@ -3640,13 +3606,12 @@ function buildSubjectCardHTML(girl, dateKey, subject, items, lockState) {
   </div>`;
 }
 
-// Real day-of-week, unless a demo override is active (see loadDemoData()) —
-// only affects which rotating chore/focus displays, never actual reset timing
-// or history dates.
+// Demo mode (and its day-of-week override) has been removed — this is now
+// just the real day-of-week. Kept as its own function since Mama's weekly
+// focus lookup calls it. STATE.demoDayOverride itself is left alone if a
+// device already has one set, so nothing gets deleted, but it's never read.
 function getEffectiveDayOfWeek() {
-  return (STATE.demoDayOverride !== null && STATE.demoDayOverride !== undefined)
-    ? STATE.demoDayOverride
-    : new Date().getDay();
+  return new Date().getDay();
 }
 
 // ============================================================
