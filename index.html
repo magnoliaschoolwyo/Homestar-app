@@ -902,10 +902,10 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
   margin-bottom: 18px;
 }
 .cal-cell {
-  aspect-ratio: 1; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.14);
+  min-height: 60px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.14);
   background: rgba(255,255,255,0.06);
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  padding: 4px 2px 3px; position: relative; cursor: pointer;
+  padding: 4px 3px 3px; position: relative; cursor: pointer;
   color: #fff; font-family: "Nunito", sans-serif;
   transition: transform 0.12s;
 }
@@ -956,12 +956,19 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 .day-event-row.done { opacity: 0.55; text-decoration: line-through; }
 .day-event-row .check-circle { width: 26px; height: 26px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 .day-event-row.done .check-circle { background: rgba(34,197,94,0.7); text-decoration: none; }
-.cal-class-dots {
-  position: absolute; top: 3px; left: 4px;
-  display: flex; gap: 2px;
+.cal-event-lines {
+  width: 100%; display: flex; flex-direction: column; gap: 1px;
+  margin-top: 2px; overflow: hidden;
 }
+.cal-event-line {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 0.5rem; font-weight: 700; line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cal-event-name { overflow: hidden; text-overflow: ellipsis; }
+.cal-event-more { color: rgba(255,255,255,0.55); font-weight: 800; padding-left: 9px; }
 .cal-class-dot {
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
 }
 .cal-legend-categories { flex-wrap: wrap; row-gap: 4px; }
 .day-detail-empty {
@@ -2253,19 +2260,30 @@ function buildMonthCalendarHTML(girl) {
     if (!inMonth) cellClasses.push("other-month");
     if (isToday) cellClasses.push("is-today");
 
-    // One dot per distinct category scheduled that day, colored to match —
-    // see CLASS_CATEGORIES / the legend below.
-    const kidItemCategories = getKidItemsForDate(girl, dKey).filter(t => t.category).map(t => t.category);
-    const dayCategories = [...new Set([...getClassesForDate(girl, dKey).map(c => c.category), ...kidItemCategories])];
-    const classDotHTML = dayCategories.length
-      ? `<span class="cal-class-dots">${dayCategories.map(cat =>
-          `<span class="cal-class-dot" style="background:${(CLASS_CATEGORIES[cat]||{}).color||"#fff"}"></span>`
-        ).join("")}</span>`
+    // Each scheduled class/categorized kid item gets its own line: a
+    // colored dot (matching CLASS_CATEGORIES) plus its actual name, not
+    // just a bare dot — capped so a busy day doesn't blow out the cell.
+    const kidItemsToday = getKidItemsForDate(girl, dKey).filter(t => t.category);
+    const scheduledToday = [
+      ...getClassesForDate(girl, dKey).map(c => ({ name: c.name, category: c.category })),
+      ...kidItemsToday.map(t => ({ name: t.name, category: t.category })),
+    ];
+    const MAX_CAL_EVENT_LINES = 3;
+    const shownEvents = scheduledToday.slice(0, MAX_CAL_EVENT_LINES);
+    const extraEventCount = scheduledToday.length - shownEvents.length;
+    const eventLinesHTML = scheduledToday.length
+      ? `<div class="cal-event-lines">
+          ${shownEvents.map(it => `<div class="cal-event-line">
+            <span class="cal-class-dot" style="background:${(CLASS_CATEGORIES[it.category]||{}).color||"#fff"}"></span>
+            <span class="cal-event-name">${escapeHtml(it.name)}</span>
+          </div>`).join("")}
+          ${extraEventCount > 0 ? `<div class="cal-event-line cal-event-more">+${extraEventCount} more</div>` : ""}
+        </div>`
       : "";
 
     cellsHTML += `<button class="${cellClasses.join(" ")}" onclick="openDayDetail('${girl}','${dKey}')">
       <span class="cal-day-num">${d.getDate()}</span>
-      ${classDotHTML}
+      ${eventLinesHTML}
       ${barOrStarHTML}
       ${ptsHTML}
     </button>`;
@@ -3012,22 +3030,23 @@ const CLASS_CATEGORIES = {
 // Seeded once on first run with the classes already in place before the
 // full add/edit/delete UI existed, so they survive without re-entry.
 function buildInitialClasses() {
-  const rec = (id, name, girl, dow, time, endTime, category) =>
-    ({ id, name, girl, daysOfWeek: [dow], date: null, startDate: null, endDate: null, time, endTime: endTime || null, category });
+  const rec = (id, name, girl, dow, time, endTime, category, startDate, endDate) =>
+    ({ id, name, girl, daysOfWeek: [dow], date: null, startDate: startDate || null, endDate: endDate || null, time, endTime: endTime || null, category });
+  const BRAINTREE_START = "2026-08-17"; // Braintree begins
   return [
-    rec("class_coop",  "Co-op",         "both", 4, "09:00", "15:45", "coop"),
+    rec("class_coop",  "Co-op",         "both", 4, "09:00", "15:45", "coop", "2026-09-03", "2026-11-19"),
     rec("class_music", "Music Lessons", "both", 1, "17:00", null,    "personal"),
     // Braintree — Kataleyah
-    rec("class_braintree_kata_ela",        "ELA",                 "kata", 2, "09:00", "10:00", "braintree"),
-    rec("class_braintree_kata_writing",    "Writing",             "kata", 3, "09:00", "10:00", "braintree"),
-    rec("class_braintree_kata_babysit",    "Babysitter Training", "kata", 1, "11:00", null,     "braintree"),
-    rec("class_braintree_kata_crochet",    "Crochet",             "kata", 2, "13:00", null,     "braintree"),
-    rec("class_braintree_kata_disney",     "Disney Dinner",       "kata", 2, "11:00", null,     "braintree"),
+    rec("class_braintree_kata_ela",        "ELA",                 "kata", 2, "09:00", "10:00", "braintree", BRAINTREE_START),
+    rec("class_braintree_kata_writing",    "Writing",             "kata", 3, "09:00", "10:00", "braintree", BRAINTREE_START),
+    rec("class_braintree_kata_babysit",    "Babysitter Training", "kata", 1, "11:00", null,     "braintree", BRAINTREE_START),
+    rec("class_braintree_kata_crochet",    "Crochet",             "kata", 2, "13:00", null,     "braintree", BRAINTREE_START),
+    rec("class_braintree_kata_disney",     "Disney Dinner",       "kata", 2, "11:00", null,     "braintree", BRAINTREE_START),
     // Braintree — Celia
-    rec("class_braintree_celia_ela",       "ELA",                 "celia", 2, "09:00", "10:00", "braintree"),
-    rec("class_braintree_celia_writing",   "Writing",             "celia", 2, "10:00", "11:00", "braintree"),
-    rec("class_braintree_celia_craftcrew", "Craft Crew",          "celia", 2, "13:00", "14:00", "braintree"),
-    rec("class_braintree_celia_entrepr",   "Entrepreneurship",    "celia", 3, "11:00", "12:00", "braintree"),
+    rec("class_braintree_celia_ela",       "ELA",                 "celia", 2, "09:00", "10:00", "braintree", BRAINTREE_START),
+    rec("class_braintree_celia_writing",   "Writing",             "celia", 2, "10:00", "11:00", "braintree", BRAINTREE_START),
+    rec("class_braintree_celia_craftcrew", "Craft Crew",          "celia", 2, "13:00", "14:00", "braintree", BRAINTREE_START),
+    rec("class_braintree_celia_entrepr",   "Entrepreneurship",    "celia", 3, "11:00", "12:00", "braintree", BRAINTREE_START),
   ];
 }
 
@@ -3874,6 +3893,7 @@ if ("serviceWorker" in navigator && location.hostname !== "www.claudeusercontent
       .then(reg => {
         swReg = reg;
         console.log("HomeStar SW registered:", reg.scope);
+        reg.update(); // explicit check now — don't rely on the browser's own default timing
       })
       .catch(err => console.log("SW not found — upload sw.js to enable offline mode."));
   });
@@ -3885,6 +3905,13 @@ if ("serviceWorker" in navigator && location.hostname !== "www.claudeusercontent
     if (document.visibilityState === "visible" && swReg) swReg.update();
   });
   window.addEventListener("pageshow", () => { if (swReg) swReg.update(); });
+
+  // iOS WebKit's service-worker update detection in installed PWAs hasn't
+  // proven reliable enough to trust a single event — belt-and-suspenders
+  // periodic check every minute while the app is actually open and visible.
+  setInterval(() => {
+    if (swReg && document.visibilityState === "visible") swReg.update();
+  }, 60 * 1000);
 }
 </script>
 </body>
