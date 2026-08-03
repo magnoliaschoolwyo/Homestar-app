@@ -959,20 +959,21 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 .day-event-row.done { opacity: 0.55; text-decoration: line-through; }
 .day-event-row .check-circle { width: 26px; height: 26px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 .day-event-row.done .check-circle { background: rgba(34,197,94,0.7); text-decoration: none; }
+/* Deliberately NOT flexbox — a previous flex+ellipsis version relied on
+   min-width:0 to truncate correctly, which Chrome tolerates missing but
+   Safari/WebKit does not, and it still wasn't confirmed fixed on a real
+   iPad. Plain block-level text with JS-side truncation (see
+   truncateForCal()) sidesteps that whole class of cross-browser risk —
+   the string is already short before it ever reaches CSS. */
 .cal-event-lines {
-  width: 100%; display: flex; flex-direction: column; gap: 1px;
-  margin-top: 2px; overflow: hidden;
+  width: 100%; margin-top: 2px; text-align: left;
 }
 .cal-event-line {
-  display: flex; align-items: center; gap: 3px; min-width: 0;
-  font-size: 0.5rem; font-weight: 700; line-height: 1.25;
+  font-size: 0.5rem; font-weight: 700; line-height: 1.3;
+  text-align: left; white-space: nowrap; overflow: hidden;
 }
-/* min-width:0 overrides the flex-item default of min-width:auto — without
-   it, Safari/WebKit won't actually truncate this and can let the line
-   overflow its cell unpredictably, unlike Chrome which is more forgiving
-   here. */
-.cal-event-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cal-event-more { color: rgba(255,255,255,0.55); font-weight: 800; padding-left: 9px; }
+.cal-event-dot-char { font-size: 0.6rem; margin-right: 2px; }
+.cal-event-more { color: rgba(255,255,255,0.55); font-weight: 800; padding-left: 8px; }
 .cal-class-dot {
   width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
 }
@@ -1159,6 +1160,10 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
       <div class="settings-row">
         <span class="settings-label">Clear all tasks for today</span>
         <button class="settings-btn danger" onclick="openResetModal()">Reset Now</button>
+      </div>
+      <div class="settings-row" style="margin-bottom:0">
+        <span class="settings-label" style="font-size:0.75rem;color:rgba(255,255,255,0.45)">App version</span>
+        <span class="settings-label" id="app-version-display" style="font-size:0.75rem;color:rgba(255,255,255,0.45)"></span>
       </div>
     </div>
 
@@ -1356,6 +1361,11 @@ html, body { height: 100%; font-family: "Nunito", sans-serif; background: #1a053
 </div>
 
 <script>
+// Shown in Settings → Manual Reset, so a glance at the screen can confirm
+// which build is actually loaded — keep this in sync with sw.js's
+// CACHE_NAME whenever that's bumped, no need to match exactly otherwise.
+const APP_VERSION = "homestar-v22";
+
 // ============================================================
 // IMAGES (embedded)
 // ============================================================
@@ -2216,6 +2226,14 @@ function backToCalendar(girl) {
   renderGirlView(girl); switchGirl(currentGirl);
 }
 
+// Truncates in JS rather than leaning on CSS text-overflow:ellipsis inside
+// a flex layout — that combination needs min-width:0 on the flex child to
+// work in Safari/WebKit (Chrome is more forgiving), which is exactly the
+// kind of subtle cross-browser gap worth just not depending on here.
+function truncateForCal(str, max) {
+  return str.length > max ? str.slice(0, max - 1) + "…" : str;
+}
+
 function buildMonthCalendarHTML(girl) {
   const cs = calendarState[girl];
   const year = cs.year, month = cs.month;
@@ -2266,9 +2284,12 @@ function buildMonthCalendarHTML(girl) {
     if (!inMonth) cellClasses.push("other-month");
     if (isToday) cellClasses.push("is-today");
 
-    // Each scheduled class/categorized kid item gets its own line: a
-    // colored dot (matching CLASS_CATEGORIES) plus its actual name, not
-    // just a bare dot — capped so a busy day doesn't blow out the cell.
+    // Each scheduled class/categorized kid item gets its own left-aligned
+    // line: a colored bullet (matching CLASS_CATEGORIES) plus its actual
+    // name, not just a bare dot — capped so a busy day doesn't blow out
+    // the cell. Truncated in JS (see truncateForCal) rather than leaning
+    // on CSS ellipsis, which is where a cross-browser flex/truncation bug
+    // lived before.
     const kidItemsToday = getKidItemsForDate(girl, dKey).filter(t => t.category);
     const scheduledToday = [
       ...getClassesForDate(girl, dKey).map(c => ({ name: c.name, category: c.category })),
@@ -2279,10 +2300,10 @@ function buildMonthCalendarHTML(girl) {
     const extraEventCount = scheduledToday.length - shownEvents.length;
     const eventLinesHTML = scheduledToday.length
       ? `<div class="cal-event-lines">
-          ${shownEvents.map(it => `<div class="cal-event-line">
-            <span class="cal-class-dot" style="background:${(CLASS_CATEGORIES[it.category]||{}).color||"#fff"}"></span>
-            <span class="cal-event-name">${escapeHtml(it.name)}</span>
-          </div>`).join("")}
+          ${shownEvents.map(it => {
+            const dotColor = (CLASS_CATEGORIES[it.category] || {}).color || "#fff";
+            return `<div class="cal-event-line"><span class="cal-event-dot-char" style="color:${dotColor}">●</span>${escapeHtml(truncateForCal(it.name, 15))}</div>`;
+          }).join("")}
           ${extraEventCount > 0 ? `<div class="cal-event-line cal-event-more">+${extraEventCount} more</div>` : ""}
         </div>`
       : "";
@@ -2880,6 +2901,8 @@ function updateSettingsView() {
   const disp = document.getElementById("adj-pts-display");
   if (disp) disp.textContent = adjGirl === "celia" ? STATE.celiaPts : STATE.kataPts;
   renderClassesSettingsList();
+  const verEl = document.getElementById("app-version-display");
+  if (verEl) verEl.textContent = APP_VERSION;
 }
 
 function buildBgPicker() {
