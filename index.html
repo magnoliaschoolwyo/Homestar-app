@@ -1910,6 +1910,13 @@ function applyStateDefaults() {
   // in place before the add/edit/delete UI existed.
   if (!STATE.classes) STATE.classes = buildInitialClasses();
   if (!STATE.classDoneByDate) STATE.classDoneByDate = { celia: {}, kata: {} };
+  // Braintree Academy's Wyoming K8 submission due dates — merged in once as
+  // an addition on top of whatever STATE.classes already holds (unlike
+  // buildInitialClasses() above, which only fires for brand-new devices).
+  if (!STATE.k8DueDatesSeeded_v1) {
+    STATE.classes = STATE.classes.concat(buildK8DueDates());
+    STATE.k8DueDatesSeeded_v1 = true;
+  }
 }
 
 let STATE = loadState();
@@ -3054,6 +3061,7 @@ const CLASS_CATEGORIES = {
   family:    { label: "Family",         color: "#34d399" },
   braintree: { label: "Braintree",      color: "#60a5fa" },
   personal:  { label: "Personal",       color: "#f472b6" },
+  duedate:   { label: "K8 Due Date",    color: "#a78bfa" },
 };
 
 // Seeded once on first run with the classes already in place before the
@@ -3076,6 +3084,58 @@ function buildInitialClasses() {
     rec("class_braintree_celia_writing",   "Writing",             "celia", 2, "10:00", "11:00", "braintree", BRAINTREE_START),
     rec("class_braintree_celia_craftcrew", "Craft Crew",          "celia", 2, "13:00", "14:00", "braintree", BRAINTREE_START),
     rec("class_braintree_celia_entrepr",   "Entrepreneurship",    "celia", 3, "11:00", "12:00", "braintree", BRAINTREE_START),
+  ];
+}
+
+// Braintree Academy's Wyoming K8 submission due dates for the 2026-2027
+// school year — one-off events (not weekly-recurring classes), since what's
+// due changes week to week even though it always falls on a Friday. Merged
+// into STATE.classes once via the k8DueDatesSeeded_v1 flag in
+// applyStateDefaults() rather than living in buildInitialClasses(), because
+// that function only seeds brand-new devices — existing families already
+// have STATE.classes populated and need these added on top of it.
+function buildK8DueDates() {
+  const oneOff = (id, name, date) =>
+    ({ id, name, girl: "both", daysOfWeek: [], date, startDate: null, endDate: null, time: null, endTime: null, category: "duedate" });
+  return [
+    oneOff("k8_due_20260821", "Semester Learning Plan Due", "2026-08-21"),
+    oneOff("k8_due_20260828", "Attendance Due", "2026-08-28"),
+    oneOff("k8_due_20260904", "Portfolio Submission #1 Due", "2026-09-04"),
+    oneOff("k8_due_20260911", "Attendance Due", "2026-09-11"),
+    oneOff("k8_due_20260918", "Progress Check Due", "2026-09-18"),
+    oneOff("k8_due_20260925", "Attendance Due", "2026-09-25"),
+    oneOff("k8_due_20261002", "Portfolio Submission #2 Due", "2026-10-02"),
+    oneOff("k8_due_20261009", "Attendance Due", "2026-10-09"),
+    oneOff("k8_due_20261016", "Progress Check Due", "2026-10-16"),
+    oneOff("k8_due_20261023", "Attendance Due", "2026-10-23"),
+    oneOff("k8_due_20261030", "Portfolio Submission #3 Due", "2026-10-30"),
+    oneOff("k8_due_20261106", "Attendance Due", "2026-11-06"),
+    oneOff("k8_due_20261113", "Progress Check & Electives Due", "2026-11-13"),
+    oneOff("k8_due_20261120", "Attendance Due", "2026-11-20"),
+    oneOff("k8_due_20261127", "Attendance Due", "2026-11-27"),
+    oneOff("k8_due_20261204", "Portfolio Submission #4 Due", "2026-12-04"),
+    oneOff("k8_due_20261211", "Attendance Due", "2026-12-11"),
+    oneOff("k8_due_20261218", "End of Semester Reflection/Attendance Due", "2026-12-18"),
+    oneOff("k8_due_20270108", "Semester Learning Plan Due", "2027-01-08"),
+    oneOff("k8_due_20270115", "Attendance Due", "2027-01-15"),
+    oneOff("k8_due_20270122", "Portfolio Submission #5 Due", "2027-01-22"),
+    oneOff("k8_due_20270129", "Attendance Due", "2027-01-29"),
+    oneOff("k8_due_20270205", "Progress Check Due", "2027-02-05"),
+    oneOff("k8_due_20270212", "Attendance Due", "2027-02-12"),
+    oneOff("k8_due_20270219", "Portfolio Submission #6 Due", "2027-02-19"),
+    oneOff("k8_due_20270226", "Attendance Due", "2027-02-26"),
+    oneOff("k8_due_20270305", "Progress Check & Electives Due", "2027-03-05"),
+    oneOff("k8_due_20270312", "Attendance Due", "2027-03-12"),
+    oneOff("k8_due_20270319", "Portfolio Submission #7 Due", "2027-03-19"),
+    oneOff("k8_due_20270326", "Attendance Due", "2027-03-26"),
+    oneOff("k8_due_20270402", "Progress Check Due", "2027-04-02"),
+    oneOff("k8_due_20270409", "Attendance Due", "2027-04-09"),
+    oneOff("k8_due_20270416", "Portfolio Submission #8 Due", "2027-04-16"),
+    oneOff("k8_due_20270423", "Attendance Due", "2027-04-23"),
+    oneOff("k8_due_20270430", "Progress Check Due", "2027-04-30"),
+    oneOff("k8_due_20270507", "Attendance Due", "2027-05-07"),
+    oneOff("k8_due_20270514", "End of Year Reflection Due", "2027-05-14"),
+    oneOff("k8_due_20270521", "Attendance Due", "2027-05-21"),
   ];
 }
 
